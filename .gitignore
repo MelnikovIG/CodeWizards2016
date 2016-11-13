@@ -1,2 +1,2 @@
-csharp-cgdk/bin/
-csharp-cgdk/obj/
+**/bin/*.*
+**/obj/*.*

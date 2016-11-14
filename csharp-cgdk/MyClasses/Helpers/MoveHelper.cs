@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,22 +42,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             var myPosition = new Point2D(Tick.Self.X, Tick.Self.Y);
             var getNearestMyWaypoint = GetNearestWayPointForPoint(myPosition);
 
-            var path = WayPointsHelper.BuildWayBetweenWaypoints(getNearestMyWaypoint, nearestTargetPoint);
+            var pathNextPoint = new Point2D();
 
-            //DebugTrace.ConsoleWriteLite(string.Join(" | ", path.Select(x => $"{x.Position.X} {x.Position.Y}")));
-
-            var pathNextPoint = path[0].Position;
-
-            if (path[0] == GameState.LastVisitedWaypoint)
+            if (nearestTargetPoint == getNearestMyWaypoint)
             {
-                pathNextPoint = path[1].Position;
+                pathNextPoint = nearestTargetPoint.Position;
             }
             else
             {
-                if (path[0].Position.GetDistanceTo(myPosition) < (Tick.Self.Radius * 2) + 5)
-                {
-                    GameState.LastVisitedWaypoint = path[0];
-                }
+                var path = WayPointsHelper.BuildWayBetweenWaypoints(getNearestMyWaypoint, nearestTargetPoint);
+                var angleWaypoints = AngleBetweenPoints(path[1].Position, path[0].Position, new Point2D(Tick.Self.X, Tick.Self.Y));
+                pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI/2 ? path[1].Position : path[0].Position;
             }
 
             var angle = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
@@ -98,20 +94,18 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             var myPosition = new Point2D(Tick.Self.X, Tick.Self.Y);
             var getNearestMyWaypoint = GetNearestWayPointForPoint(myPosition);
 
-            var path = WayPointsHelper.BuildWayBetweenWaypoints(getNearestMyWaypoint, nearestTargetPoint);
+            var pathNextPoint = new Point2D();
 
-            var pathNextPoint = path[0].Position;
-
-            if (path[0] == GameState.LastVisitedWaypoint)
+            if (nearestTargetPoint == getNearestMyWaypoint)
             {
-                pathNextPoint = path[1].Position;
+                pathNextPoint = nearestTargetPoint.Position;
             }
             else
             {
-                if (path[0].Position.GetDistanceTo(myPosition) < 10)
-                {
-                    GameState.LastVisitedWaypoint = path[0];
-                }
+                var path = WayPointsHelper.BuildWayBetweenWaypoints(getNearestMyWaypoint, nearestTargetPoint);
+
+                var angleWaypoints = AngleBetweenPoints(path[1].Position, path[0].Position, new Point2D(Tick.Self.X, Tick.Self.Y));
+                pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI / 2 ? path[1].Position : path[0].Position;
             }
 
             var angle = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y) + Math.PI/2;
@@ -130,5 +124,15 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     .First(x => x.Position.GetDistanceTo(piont) == nearestTargetWaypointDistance);
             return nearestTargetWaypoint;
         }
+
+        private static double AngleBetweenPoints(Point2D a, Point2D b, Point2D c)
+        {
+            double x1 = a.X - b.X, x2 = c.X - b.X;
+            double y1 = a.Y - b.Y, y2 = c.Y - b.Y;
+            double d1 = Math.Sqrt(x1 * x1 + y1 * y1);
+            double d2 = Math.Sqrt(x2 * x2 + y2 * y2);
+            return Math.Acos((x1 * x2 + y1 * y2) / (d1 * d2));
+        }
+
     }
 }

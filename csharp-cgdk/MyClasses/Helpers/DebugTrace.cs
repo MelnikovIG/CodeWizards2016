@@ -12,7 +12,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         public static void ConsoleWriteLite(string s)
         {
-            //Console.WriteLine(s);
+            Console.WriteLine(s);
         }
     }
 }

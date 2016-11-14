@@ -37,11 +37,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             }
             else
             {
-                if (GameState.LastVisitedWaypoint != null)
-                {
-                    AttackAnyTargetOnBackward();
-                    MoveHelper.MoveBackwardTo(GameState.LastVisitedWaypoint.Position);
-                }
+                AttackAnyTargetOnBackward();
+                MoveHelper.MoveBackwardTo(new Point2D(0, Tick.Game.MapSize));
             }
         }
 

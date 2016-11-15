@@ -26,11 +26,84 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         {
             IsWaypointsBuilt = true;
 
+            //var waypointCoordinates = TestAllBotWaypoints();
+            //var waypointCoordinates = TestAllMidWaypoints();
+            //var waypointCoordinates = TestAllTopWaypoints();
+            //var waypointCoordinates = TestCenterTop();
+            var waypointCoordinates = GetDefaultWaypoints();
+
+            var waypoints = BuildLinkedWaypoints(waypointCoordinates);
+            AllWaypoints.AddRange(waypoints);
+        }
+
+        public static List<Point2D> TestCenterTop()
+        {
+            var mapSize = Tick.Game.MapSize;
+            return new List<Point2D>
+                {
+                    new Point2D(0,0),
+                    new Point2D(mapSize/2.0,0),
+                };
+        }
+
+        public static List<Point2D> TestAllTopWaypoints()
+        {
+            var mapSize = Tick.Game.MapSize;
+            return new List<Point2D>
+                {
+                    new Point2D(100.0D, mapSize - 100.0D),
+                    new Point2D(100.0D, mapSize - 400.0D),
+                    new Point2D(200.0D, mapSize - 800.0D),
+                    new Point2D(200.0D, mapSize*0.75D),
+                    new Point2D(200.0D, mapSize*0.5D),
+                    new Point2D(200.0D, mapSize*0.25D),
+                    new Point2D(500.0D, 500.0D), //LEFT TOP POINT
+                    new Point2D(mapSize*0.25D, 200.0D),
+                    new Point2D(mapSize*0.5D, 200.0D),
+                    new Point2D(mapSize*0.75D, 200.0D),
+                    new Point2D(mapSize - 200.0D, 200.0D)
+                };
+        }
+
+        public static List<Point2D> TestAllMidWaypoints()
+        {
+            var mapSize = Tick.Game.MapSize;
+            return new List<Point2D>
+                {
+                    new Point2D(100.0D, mapSize - 100.0D),
+                    /*random.nextBoolean() ? new Point2D(600.0D, mapSize - 200.0D) : */
+                    new Point2D(200.0D, mapSize - 600.0D),
+                    new Point2D(800.0D, mapSize - 800.0D),
+                    new Point2D(mapSize - 600.0D, 600.0D)
+                };
+        }
+
+        public static List<Point2D> TestAllBotWaypoints()
+        {
+            var mapSize = Tick.Game.MapSize;
+            return new List<Point2D>
+                {
+                    new Point2D(100.0D, mapSize - 100.0D),
+                    new Point2D(400.0D, mapSize - 100.0D),
+                    new Point2D(800.0D, mapSize - 200.0D),
+                    new Point2D(mapSize * 0.25D, mapSize - 200.0D),
+                    new Point2D(mapSize * 0.5D, mapSize - 200.0D),
+                    new Point2D(mapSize * 0.75D, mapSize - 200.0D),
+                    new Point2D(mapSize - 500.0D, mapSize - 500.0D), //RIGHT BOT POINT
+                    new Point2D(mapSize - 200.0D, mapSize * 0.75D),
+                    new Point2D(mapSize - 200.0D, mapSize * 0.5D),
+                    new Point2D(mapSize - 200.0D, mapSize * 0.25D),
+                    new Point2D(mapSize - 200.0D, 200.0D)
+                };
+        }
+
+        private static List<Point2D> GetDefaultWaypoints()
+        {
             var mapSize = Tick.Game.MapSize;
 
             var lane = LaneType.Top;
 
-            switch ((int) Tick.Self.Id)
+            switch ((int)Tick.Self.Id)
             {
                 case 1:
                 case 2:
@@ -99,10 +172,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     new Point2D(mapSize - 200.0D, 200.0D)
                 });
             }
-
-            var waypoints = BuildLinkedWaypoints(waypointCoordinates);
-            AllWaypoints.AddRange(waypoints);
-        }
+            return waypointCoordinates;
+        } 
 
         public static List<WayPoint> BuildLinkedWaypoints(List<Point2D> wayPointCoordinates)
         {

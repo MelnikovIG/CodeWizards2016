@@ -32,13 +32,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 else
                 {
                     var centerPoint = new Point2D(Tick.Game.MapSize, 0);
-                    MoveHelper.MoveTo(centerPoint);
+                    MoveHelper.MoveTo(centerPoint, true);
                 }
             }
             else
             {
                 AttackAnyTargetOnBackward();
-                MoveHelper.MoveBackwardTo(new Point2D(0, Tick.Game.MapSize));
+                MoveHelper.MoveTo(new Point2D(0, Tick.Game.MapSize), false);
             }
         }
 

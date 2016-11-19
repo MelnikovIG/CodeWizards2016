@@ -27,10 +27,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             IsWaypointsBuilt = true;
 
             //var waypointCoordinates = TestAllBotWaypoints();
-            var waypointCoordinates = TestAllMidWaypoints();
+            //var waypointCoordinates = TestAllMidWaypoints();
             //var waypointCoordinates = TestAllTopWaypoints();
             //var waypointCoordinates = TestCenterTop();
-            //var waypointCoordinates = GetDefaultWaypoints();
+            var waypointCoordinates = GetDefaultWaypoints();
 
             var waypoints = BuildLinkedWaypoints(waypointCoordinates);
             AllWaypoints.AddRange(waypoints);

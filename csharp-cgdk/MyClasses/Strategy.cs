@@ -31,13 +31,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
                 else
                 {
-                    var tower = UnitHelper.GetNearestFriendBuidigs(200).Where(x => x.Type == BuildingType.GuardianTower).FirstOrDefault();
-
                     var centerPoint = new Point2D(Tick.Game.MapSize, 0);
                     var moveToParams = new MoveToParams()
                     {
                         TargetPoint = centerPoint,
-                        LookAtPoint = tower != null ? new Point2D(tower.X,tower.Y) : (Point2D?)null
+                        //LookAtPoint = new Point2D(0, Tick.Game.MapSize)
                     };
                     MoveHelper.MoveTo(moveToParams);
                 }

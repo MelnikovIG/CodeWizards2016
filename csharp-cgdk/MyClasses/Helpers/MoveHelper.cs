@@ -21,9 +21,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var firstUnit = stuckedLivingUnins.First();
 
                 var randomAngle = random.NextDouble()*Math.PI/2;
-                var angle1 = Tick.Self.GetAngleTo(firstUnit);
-                Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI/2 + randomAngle : angle1 - Math.PI/2 - randomAngle;
-                Tick.Move.Speed = Tick.Game.WizardForwardSpeed;
+                //var randomAngle = 0;
+                var angleToUnit = Tick.Self.GetAngleTo(firstUnit);
+
+                Tick.Move.Turn = angleToUnit >= 0
+                    ? angleToUnit - Math.PI/2 - randomAngle
+                    : angleToUnit + Math.PI/2 + randomAngle;
+                Tick.Move.StrafeSpeed = angleToUnit >= 0 ? -Tick.Game.WizardStrafeSpeed : Tick.Game.WizardStrafeSpeed;
+                Tick.Move.Speed = Math.Abs(angleToUnit) < Math.PI/2
+                    ? Tick.Game.WizardForwardSpeed
+                    : -Tick.Game.WizardBackwardSpeed;
+
                 //Если застряли надолго пробуем пробить путь вперед
                 if (GameState.StackedTickCount >= 30)
                 {

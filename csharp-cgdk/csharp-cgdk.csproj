@@ -100,6 +100,7 @@
     <Compile Include="IStrategy.cs" />
     <Compile Include="MyClasses\Basic\Point2D.cs" />
     <Compile Include="MyClasses\Basic\PushPower.cs" />
+    <Compile Include="MyClasses\Basic\Vector2D.cs" />
     <Compile Include="MyClasses\Helpers\GameState.cs" />
     <Compile Include="MyClasses\Helpers\MoveHelper.cs" />
     <Compile Include="MyClasses\Helpers\TickHelper.cs" />
@@ -136,6 +137,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TodoList.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

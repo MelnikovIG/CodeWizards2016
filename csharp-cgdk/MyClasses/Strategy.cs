@@ -31,14 +31,29 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
                 else
                 {
+                    var tower = UnitHelper.GetNearestFriendBuidigs(200).Where(x => x.Type == BuildingType.GuardianTower).FirstOrDefault();
+
                     var centerPoint = new Point2D(Tick.Game.MapSize, 0);
-                    MoveHelper.MoveTo(centerPoint, true);
+                    var moveToParams = new MoveToParams()
+                    {
+                        TargetPoint = centerPoint,
+                        LookAtPoint = tower != null ? new Point2D(tower.X,tower.Y) : (Point2D?)null
+                    };
+                    MoveHelper.MoveTo(moveToParams);
                 }
             }
             else
             {
                 AttackAnyTargetOnBackward();
-                MoveHelper.MoveTo(new Point2D(0, Tick.Game.MapSize), false);
+
+                var viewTarget = GetOptimalTargetToAtack(Tick.Self.CastRange * 1.5);
+
+                var moveToParams = new MoveToParams()
+                {
+                    TargetPoint = new Point2D(0, Tick.Game.MapSize),
+                    LookAtPoint = viewTarget != null ? new Point2D(viewTarget.X, viewTarget.Y) : (Point2D?)null
+                };
+                MoveHelper.MoveTo(moveToParams);
             }
         }
 

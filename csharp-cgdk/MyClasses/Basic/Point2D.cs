@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
 {
+    [DebuggerDisplay("x = {X} y = {Y}")]
     public struct Point2D
     {
         public Point2D(double x, double y)

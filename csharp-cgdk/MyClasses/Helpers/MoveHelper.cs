@@ -13,27 +13,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         private static Random random = new Random();
 
-
-        public static void MoveTo(Point2D targetPoint, bool faceForward)
+        public static void MoveTo(MoveToParams moveToParams)
         {
             var stuckedLivingUnins = UnitHelper.GetForwardStuckedLivingUnits();
             if (stuckedLivingUnins.Any())
             {
                 var firstUnit = stuckedLivingUnins.First();
 
-                if (faceForward)
-                {
-                    var randomAngle = random.NextDouble()*Math.PI/2;
-                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
-                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI/2 + randomAngle : angle1 - Math.PI/2 - randomAngle;
-                    Tick.Move.Speed = Tick.Game.WizardForwardSpeed;
-                }
-                else
-                {
-                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
-                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI/2 : angle1 - Math.PI/2;
-                    Tick.Move.Speed = -Tick.Game.WizardBackwardSpeed;
-                }
+                var randomAngle = random.NextDouble()*Math.PI/2;
+                var angle1 = Tick.Self.GetAngleTo(firstUnit);
+                Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI/2 + randomAngle : angle1 - Math.PI/2 - randomAngle;
+                Tick.Move.Speed = Tick.Game.WizardForwardSpeed;
                 //Если застряли надолго пробуем пробить путь вперед
                 if (GameState.StackedTickCount >= 30)
                 {
@@ -53,7 +43,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             }
             GameState.StackedTickCount = 0;
 
-            var nearestTargetPoint = GetNearestWayPointForPoint(targetPoint);
+            var nearestTargetPoint = GetNearestWayPointForPoint(moveToParams.TargetPoint);
 
             var myPosition = new Point2D(Tick.Self.X, Tick.Self.Y);
             var getNearestMyWaypoint = GetNearestWayPointForPoint(myPosition);
@@ -72,11 +62,29 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI/2 ? path[1].Position : path[0].Position;
             }
 
-            var angle = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
-            var speed = faceForward ? Tick.Game.WizardForwardSpeed : Tick.Game.WizardBackwardSpeed;
+            var angleToMovePoint = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
+            var speed = Math.Abs(angleToMovePoint) < Math.PI/2
+                ? Tick.Game.WizardForwardSpeed
+                : -Tick.Game.WizardBackwardSpeed;
 
-            Tick.Move.Speed = faceForward ? speed : -speed;
-            Tick.Move.Turn = faceForward ? angle : -angle;
+            var strafeSpeed = angleToMovePoint > 0
+                ? Tick.Game.WizardStrafeSpeed
+                : -Tick.Game.WizardStrafeSpeed;
+
+            var a = Math.Abs(Math.Sin(angleToMovePoint));
+            var b = Math.Abs(Math.Cos(angleToMovePoint));
+            speed = speed*b;
+            strafeSpeed = strafeSpeed*a;
+
+
+            var turnAngle = moveToParams.LookAtPoint != null
+                ? Tick.Self.GetAngleTo(moveToParams.LookAtPoint.Value.X, moveToParams.LookAtPoint.Value.Y)
+                : angleToMovePoint;
+
+
+            Tick.Move.Speed = speed;
+            Tick.Move.StrafeSpeed = strafeSpeed;
+            Tick.Move.Turn = turnAngle;
         }
 
         private static WayPoint GetNearestWayPointForPoint(Point2D piont)
@@ -97,6 +105,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             double d2 = Math.Sqrt(x2*x2 + y2*y2);
             return Math.Acos((x1*x2 + y1*y2)/(d1*d2));
         }
+    }
 
+    public class MoveToParams
+    {
+        public Point2D TargetPoint { get; set; }
+        public Point2D? LookAtPoint { get; set; }
     }
 }

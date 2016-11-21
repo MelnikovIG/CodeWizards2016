@@ -15,41 +15,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static void MoveTo(MoveToParams moveToParams)
         {
-            var stuckedLivingUnins = UnitHelper.GetForwardStuckedLivingUnits();
-            if (stuckedLivingUnins.Any())
-            {
-                var firstUnit = stuckedLivingUnins.First();
-
-                var randomAngle = random.NextDouble()*Math.PI/2;
-                //var randomAngle = 0;
-                var angleToUnit = Tick.Self.GetAngleTo(firstUnit);
-
-                Tick.Move.Turn = angleToUnit >= 0
-                    ? angleToUnit - Math.PI/2 - randomAngle
-                    : angleToUnit + Math.PI/2 + randomAngle;
-                Tick.Move.StrafeSpeed = angleToUnit >= 0 ? -Tick.Game.WizardStrafeSpeed : Tick.Game.WizardStrafeSpeed;
-                Tick.Move.Speed = Math.Abs(angleToUnit) < Math.PI/2
-                    ? Tick.Game.WizardForwardSpeed
-                    : -Tick.Game.WizardBackwardSpeed;
-
-                //Если застряли надолго пробуем пробить путь вперед
-                if (GameState.StackedTickCount >= 30)
-                {
-                    var firstEnemyUnit =
-                        stuckedLivingUnins.Where(x => x.Faction != Tick.Self.Faction)
-                            .OrderBy(x => x.Life)
-                            .FirstOrDefault();
-                    if (firstEnemyUnit != null)
-                    {
-                        Strategy.AtackTarget(firstEnemyUnit);
-                    }
-                }
-
-                GameState.StackedTickCount++;
-
-                return;
-            }
-            GameState.StackedTickCount = 0;
 
             var nearestTargetPoint = GetNearestWayPointForPoint(moveToParams.TargetPoint);
 
@@ -67,8 +32,62 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var path = WayPointsHelper.BuildWayBetweenWaypoints(getNearestMyWaypoint, nearestTargetPoint);
                 var angleWaypoints = AngleBetweenPoints(path[1].Position, path[0].Position,
                     new Point2D(Tick.Self.X, Tick.Self.Y));
-                pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI/2 ? path[1].Position : path[0].Position;
+                pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI / 2 ? path[1].Position : path[0].Position;
             }
+
+            var angleToTargetPoint = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
+
+            var allNearLivingUnins = UnitHelper.GetForwardStuckedLivingUnits();
+            var stuckedLivingUnins = allNearLivingUnins.Where(x =>
+                (Tick.Self.GetAngleTo(x) <= angleToTargetPoint + Math.PI/2) ||
+                (Tick.Self.GetAngleTo(x) >= angleToTargetPoint - Math.PI/2)
+                ).ToList();
+
+            if (stuckedLivingUnins.Any())
+            {
+                var firstUnit = stuckedLivingUnins.First();
+
+                var faceForward = Math.Abs(angleToTargetPoint) <= Math.PI/2;
+                if (faceForward)
+                {
+                    var randomAngle = random.NextDouble() * Math.PI / 2;
+                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
+                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI / 2 + randomAngle : angle1 - Math.PI / 2 - randomAngle;
+                    Tick.Move.Speed = Tick.Game.WizardForwardSpeed;
+                }
+                else
+                {
+                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
+                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI / 2 : angle1 - Math.PI / 2;
+                    Tick.Move.Speed = -Tick.Game.WizardBackwardSpeed;
+                }
+             
+                //Если застряли надолго пробуем пробить путь вперед
+                if (GameState.StackedTickCount >= 30)
+                {
+                    var firstEnemyUnit =
+                        stuckedLivingUnins.Where(x => x.Faction != Tick.Self.Faction)
+                            .OrderBy(x => x.Life)
+                            .FirstOrDefault();
+
+                    if (firstEnemyUnit == null)
+                    {
+                        firstEnemyUnit = allNearLivingUnins.Where(x => x.Faction != Tick.Self.Faction)
+                            .OrderBy(x => x.Life)
+                            .FirstOrDefault();
+                    }
+
+                    if (firstEnemyUnit != null)
+                    {
+                        Strategy.AtackTarget(firstEnemyUnit);
+                    }
+                }
+
+                GameState.StackedTickCount++;
+
+                return;
+            }
+            GameState.StackedTickCount = 0;
 
             var angleToMovePoint = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
             var speed = Math.Abs(angleToMovePoint) < Math.PI/2

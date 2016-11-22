@@ -14,5 +14,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         {
             //Console.WriteLine(s);
         }
+
+        public static void ExecuteVisualizer(Action action)
+        {
+#if VISUALIZER
+            action?.Invoke();
+#endif
+        }
     }
 }

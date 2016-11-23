@@ -104,6 +104,7 @@
     <Compile Include="MyClasses\Basic\Vector2D.cs" />
     <Compile Include="MyClasses\Helpers\GameState.cs" />
     <Compile Include="MyClasses\Helpers\MoveHelper.cs" />
+    <Compile Include="MyClasses\Helpers\ProjectilesHelper.cs" />
     <Compile Include="MyClasses\Helpers\TickHelper.cs" />
     <Compile Include="MyClasses\Helpers\DebugTrace.cs" />
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />

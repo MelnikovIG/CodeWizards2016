@@ -24,46 +24,57 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             return nearUnits;
         }
 
-        public static List<Building> GetNearestEnemyBuidigs(double range)
+        private static bool GetDistance<TCircularUnit>(TCircularUnit unit, double range, GetObjectRangeMode rangeMode)
+            where TCircularUnit : CircularUnit
         {
-            List<Building> targets = new List<Building>();
-            targets.AddRange(Tick.World.Buildings.Where(x => x.Faction != Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
+            if (rangeMode == GetObjectRangeMode.BorderToBorder)
+            {
+                return Tick.Self.GetDistanceTo(unit) - unit.Radius - Tick.Self.Radius <= range;
+            }
+            else if (rangeMode == GetObjectRangeMode.CenterToTargetBorder)
+            {
+                return Tick.Self.GetDistanceTo(unit) - unit.Radius <= range;
+            }
+
+            return Tick.Self.GetDistanceTo(unit) <= range;
         }
 
-        public static List<Building> GetNearestFriendBuidigs(double range)
+        public static List<Building> GetNearestBuidigs(double range, bool friendly,
+            GetObjectRangeMode rangeMode = GetObjectRangeMode.CenterToCenter)
         {
-            List<Building> targets = new List<Building>();
-            targets.AddRange(Tick.World.Buildings.Where(x => x.Faction == Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
+            return
+                Tick.World.Buildings.Where(
+                    x => friendly ? x.Faction == Tick.Self.Faction : x.Faction != Tick.Self.Faction)
+                    .Where(x => GetDistance(x, range, rangeMode))
+                    .ToList();
         }
 
-        public static List<Wizard> GetNearestEnemyWizards(double range)
+        public static List<Wizard> GetNearestWizards(double range, bool friendly,
+            GetObjectRangeMode rangeMode = GetObjectRangeMode.CenterToCenter)
         {
-            List<Wizard> targets = new List<Wizard>();
-            targets.AddRange(Tick.World.Wizards.Where(x => x.Faction != Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
+            return
+                Tick.World.Wizards.Where(x => friendly ? x.Faction == Tick.Self.Faction : x.Faction != Tick.Self.Faction)
+                    .Where(x => GetDistance(x, range, rangeMode))
+                    .ToList();
         }
 
-        public static List<Wizard> GetNearestFriendWizards(double range)
+        public static List<Minion> GetNearestMinions(double range, bool friendly,
+            GetObjectRangeMode rangeMode = GetObjectRangeMode.CenterToCenter)
         {
-            List<Wizard> targets = new List<Wizard>();
-            targets.AddRange(Tick.World.Wizards.Where(x => x.Faction == Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
+            return
+                Tick.World.Minions.Where(x => friendly ? x.Faction == Tick.Self.Faction : x.Faction != Tick.Self.Faction)
+                    .Where(x => GetDistance(x, range, rangeMode))
+                    .ToList();
         }
+    }
 
-        public static List<Minion> GetNearestEnemyMinions(double range)
-        {
-            List<Minion> targets = new List<Minion>();
-            targets.AddRange(Tick.World.Minions.Where(x => x.Faction != Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
-        }
-
-        public static List<Minion> GetNearestFriendMinions(double range)
-        {
-            List<Minion> targets = new List<Minion>();
-            targets.AddRange(Tick.World.Minions.Where(x => x.Faction == Tick.Self.Faction));
-            return targets.Where(x => Tick.Self.GetDistanceTo(x) <= range).ToList();
-        }
+    public enum GetObjectRangeMode
+    {
+        //Расстояние от цента до центра
+        CenterToCenter,
+        //Растрояние от края до края
+        BorderToBorder,
+        //От центра до края цели
+        CenterToTargetBorder
     }
 }

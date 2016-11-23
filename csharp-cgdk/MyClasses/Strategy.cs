@@ -70,7 +70,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             };
 
             var nearestEnemyWizards =
-                UnitHelper.GetNearestEnemyWizards(castRange).Where(isAngleAllowedToAttack).ToList();
+                UnitHelper.GetNearestWizards(castRange, false, GetObjectRangeMode.CenterToTargetBorder).Where(isAngleAllowedToAttack).ToList();
             if (nearestEnemyWizards.Count > 0)
             {
                 targetToAtack = nearestEnemyWizards.OrderBy(x => x.Life).FirstOrDefault();
@@ -78,8 +78,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             else
             {
                 var nearestEnemyBuidings =
-                    UnitHelper.GetNearestEnemyBuidigs(castRange).Where(isAngleAllowedToAttack).ToList();
-                ;
+                    UnitHelper.GetNearestBuidigs(castRange, false).Where(isAngleAllowedToAttack).ToList();
+                
                 if (nearestEnemyBuidings.Count > 0)
                 {
                     targetToAtack = nearestEnemyBuidings.OrderBy(x => x.Life).FirstOrDefault();
@@ -87,7 +87,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 else
                 {
                     var nearestEnemyMinions =
-                        UnitHelper.GetNearestEnemyMinions(castRange).Where(isAngleAllowedToAttack).ToList();
+                        UnitHelper.GetNearestMinions(castRange, false).Where(isAngleAllowedToAttack).ToList();
                     ;
                     if (nearestEnemyMinions.Count > 0)
                     {
@@ -130,21 +130,21 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
         {
             LivingUnit targetToAtack = null;
 
-            var nearestEnemyWizards = UnitHelper.GetNearestEnemyWizards(range);
+            var nearestEnemyWizards = UnitHelper.GetNearestWizards(range, false, GetObjectRangeMode.CenterToTargetBorder);
             if (nearestEnemyWizards.Count > 0)
             {
                 targetToAtack = nearestEnemyWizards.OrderBy(x => x.Life).FirstOrDefault();
             }
             else
             {
-                var nearestEnemyBuidings = UnitHelper.GetNearestEnemyBuidigs(range);
+                var nearestEnemyBuidings = UnitHelper.GetNearestBuidigs(range, false, GetObjectRangeMode.CenterToTargetBorder);
                 if (nearestEnemyBuidings.Count > 0)
                 {
                     targetToAtack = nearestEnemyBuidings.OrderBy(x => x.Life).FirstOrDefault();
                 }
                 else
                 {
-                    var nearestEnemyMinions = UnitHelper.GetNearestEnemyMinions(range);
+                    var nearestEnemyMinions = UnitHelper.GetNearestMinions(range, false, GetObjectRangeMode.CenterToTargetBorder);
                     if (nearestEnemyMinions.Count > 0)
                     {
                         targetToAtack = nearestEnemyMinions.OrderBy(x => x.Life).FirstOrDefault();
@@ -160,7 +160,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             double distance = Tick.Self.GetDistanceTo(target);
 
             // ... и он в пределах досягаемости наших заклинаний, ...
-            if (distance <= Tick.Self.CastRange)
+            if (distance <= Tick.Self.CastRange + target.Radius)
             {
                 double angle = Tick.Self.GetAngleTo(target);
 
@@ -210,14 +210,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     return power*(livingUnit.Life/(double) livingUnit.MaxLife);
                 };
 
-            var enemyWizardsPower = UnitHelper.GetNearestEnemyWizards(enemyRange).Select(x => getWizardPower(x)).Sum();
-            var enemyMinionsPower = UnitHelper.GetNearestEnemyMinions(enemyRange).Select(x => getMinionPower(x)).Sum();
-            var enemyTowersPower = UnitHelper.GetNearestEnemyBuidigs(enemyRange).Select(x => getBuidingPower(x)).Sum();
+            var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyRange, false).Select(x => getWizardPower(x)).Sum();
+            var enemyMinionsPower = UnitHelper.GetNearestMinions(enemyRange, false).Select(x => getMinionPower(x)).Sum();
+            var enemyTowersPower = UnitHelper.GetNearestBuidigs(enemyRange, false).Select(x => getBuidingPower(x)).Sum();
             var enemyPower = enemyWizardsPower + enemyMinionsPower + enemyTowersPower;
 
-            var friendlyWizardsPower = UnitHelper.GetNearestFriendWizards(friendRange).Select(x => getWizardPower(x)).Sum();
-            var friendlyMinionsPower = UnitHelper.GetNearestFriendMinions(friendRange).Select(x => getMinionPower(x)).Sum();
-            var friendlyTowersPower = UnitHelper.GetNearestFriendBuidigs(friendRange).Select(x => getBuidingPower(x)).Sum();
+            var friendlyWizardsPower = UnitHelper.GetNearestWizards(friendRange, true).Select(x => getWizardPower(x)).Sum();
+            var friendlyMinionsPower = UnitHelper.GetNearestMinions(friendRange, true).Select(x => getMinionPower(x)).Sum();
+            var friendlyTowersPower = UnitHelper.GetNearestBuidigs(friendRange, true).Select(x => getBuidingPower(x)).Sum();
             var friendlyPower = friendlyWizardsPower + friendlyMinionsPower + friendlyTowersPower;
 
             friendlyPower = friendlyPower*(Tick.Self.Life/(double) Tick.Self.MaxLife);

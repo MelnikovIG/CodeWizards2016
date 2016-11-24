@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
 {
     [DebuggerDisplay("x = {X} y = {Y}")]
-    public struct Point2D
+    public class Point2D
     {
         public Point2D(double x, double y)
         {
@@ -32,6 +32,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
         public static double Hypotenuse(double a, double b)
         {
             return Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
+        }
+
+        public static Point2D GetPointAt(Point2D startPoint, double angle, double range)
+        {
+            return new Point2D(
+                startPoint.X - range * Math.Cos(angle + Math.PI /*/ 2*/),
+                startPoint.Y - range * Math.Sin(angle + Math.PI /*/ 2*/)
+                );
         }
     }
 }

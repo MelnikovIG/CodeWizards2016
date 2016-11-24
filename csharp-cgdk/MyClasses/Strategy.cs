@@ -31,10 +31,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
                 else
                 {
-                    var centerPoint = new Point2D(Tick.Game.MapSize, 0);
+                    var enemyBasePoint = new Point2D(Tick.Game.MapSize, 0);
                     var moveToParams = new MoveToParams()
                     {
-                        TargetPoint = centerPoint,
+                        TargetPoint = enemyBasePoint,
                         //LookAtPoint = new Point2D(0, Tick.Game.MapSize)
                     };
                     MoveHelper.MoveTo(moveToParams);
@@ -49,10 +49,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 var moveToParams = new MoveToParams()
                 {
                     TargetPoint = new Point2D(0, Tick.Game.MapSize),
-                    LookAtPoint = viewTarget != null ? new Point2D(viewTarget.X, viewTarget.Y) : (Point2D?)null
+                    LookAtPoint = viewTarget != null ? new Point2D(viewTarget.X, viewTarget.Y) : null
                 };
                 MoveHelper.MoveTo(moveToParams);
             }
+
+            //ProjectilesHelper.DetectToMeProjectiles();
         }
 
         //Атаковать любую цель при отступлении, которая попадает в рендж
@@ -194,11 +196,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             var minionBasePower = 0.3;
             var towerBasePower = 0.4;
             var baseBasePower = 0.7;
-            var enemyRange = Tick.Self.CastRange*1.2;
+            var enemyRange = Tick.Self.CastRange + Tick.Game.WizardRadius * 2/**1.2*/;
             var friendRange = Tick.Self.CastRange;
 
             Func<Wizard, double> getWizardPower =
-                (livingUnit) => wizardBasePower*(livingUnit.Life/(double) livingUnit.MaxLife);
+                (livingUnit) => wizardBasePower*(livingUnit.Life/(double) livingUnit.MaxLife) * ((Tick.Game.MagicMissileCooldownTicks - livingUnit.RemainingCooldownTicksByAction[2])/ (double)Tick.Game.MagicMissileCooldownTicks);
 
             Func<Minion, double> getMinionPower =
                 (livingUnit) => minionBasePower*(livingUnit.Life/(double) livingUnit.MaxLife);

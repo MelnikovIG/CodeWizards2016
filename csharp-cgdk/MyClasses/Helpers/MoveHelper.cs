@@ -21,7 +21,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             var myPosition = new Point2D(Tick.Self.X, Tick.Self.Y);
             var getNearestMyWaypoint = GetNearestWayPointForPoint(myPosition);
 
-            var pathNextPoint = new Point2D();
+            var pathNextPoint = (Point2D) null;
 
             if (nearestTargetPoint == getNearestMyWaypoint)
             {
@@ -105,7 +105,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
 
             var turnAngle = moveToParams.LookAtPoint != null
-                ? Tick.Self.GetAngleTo(moveToParams.LookAtPoint.Value.X, moveToParams.LookAtPoint.Value.Y)
+                ? Tick.Self.GetAngleTo(moveToParams.LookAtPoint.X, moveToParams.LookAtPoint.Y)
                 : angleToMovePoint;
 
 
@@ -137,6 +137,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     public class MoveToParams
     {
         public Point2D TargetPoint { get; set; }
-        public Point2D? LookAtPoint { get; set; }
+        public Point2D LookAtPoint { get; set; }
     }
 }

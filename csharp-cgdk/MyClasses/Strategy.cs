@@ -22,12 +22,25 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
         public static void Execute()
         {
             var pushPower = GetPushPower();
-            if (pushPower.FrienlyPower > pushPower.EnemyPower)
+
+            DebugTrace.ExecuteVisualizer(() =>
+            {
+                var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
+                DebugTrace.ConsoleWriteLite(
+                    $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
+            });
+
+            if (pushPower.FrienlyPower >= pushPower.EnemyPower)
             {
                 var target = GetOptimalTargetToAtack(Tick.Self.CastRange);
                 if (target != null)
                 {
                     AtackTarget(target);
+                    MoveHelper.MoveTo(new MoveToParams()
+                    {
+                        TargetPoint = new Point2D(target.X, target.Y),
+                        LookAtPoint = new Point2D(target.X, target.Y),
+                    });
                 }
                 else
                 {
@@ -53,8 +66,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 };
                 MoveHelper.MoveTo(moveToParams);
             }
-
-            //ProjectilesHelper.DetectToMeProjectiles();
         }
 
         //Атаковать любую цель при отступлении, которая попадает в рендж
@@ -172,10 +183,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 // Если цель перед нами, ...
                 if (Math.Abs(angle) < Tick.Game.StaffSector/2.0D)
                 {
-                    if (distance - target.Radius <= 70)
+                    if (distance - target.Radius <= Tick.Game.StaffRange)
                     {
                         // ... то атакуем с руки.
-                        Tick.Move.Action = ActionType.MagicMissile;
+                        Tick.Move.Action = ActionType.Staff;
                         Tick.Move.CastAngle = angle;
                         Tick.Move.MinCastDistance = distance - target.Radius + Tick.Game.MagicMissileRadius;
                     }
@@ -196,20 +207,104 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             var minionBasePower = 0.3;
             var towerBasePower = 0.4;
             var baseBasePower = 0.7;
-            var enemyRange = Tick.Self.CastRange + Tick.Game.WizardRadius * 2/**1.2*/;
+            var enemyRange = Tick.Self.CastRange + Tick.Game.WizardRadius * 2;
             var friendRange = Tick.Self.CastRange;
 
             Func<Wizard, double> getWizardPower =
-                (livingUnit) => wizardBasePower*(livingUnit.Life/(double) livingUnit.MaxLife) * ((Tick.Game.MagicMissileCooldownTicks - livingUnit.RemainingCooldownTicksByAction[2])/ (double)Tick.Game.MagicMissileCooldownTicks);
+                (wizard) =>
+                {
+                    //От создных героев олку мало) сделаем коэфф 0.3
+                    if (wizard.Faction == Tick.Self.Faction && !wizard.IsMe)
+                    {
+                        return wizardBasePower*0.3;
+                    }
+                    else
+                    {
+                        var hasEmpower = wizard.Statuses.Any(x => x.Type == StatusType.Empowered);
+                        var hasHaste = wizard.Statuses.Any(x => x.Type == StatusType.Hastened);
+                        var hasShield = wizard.Statuses.Any(x => x.Type == StatusType.Shielded);
+
+                        var result = wizardBasePower*(wizard.Life/(double) wizard.MaxLife)*
+                               ((Tick.Game.MagicMissileCooldownTicks - wizard.RemainingCooldownTicksByAction[2])/
+                                (double) Tick.Game.MagicMissileCooldownTicks);
+
+                        if (hasEmpower)
+                        {
+                            result *= 1.5;
+                        }
+
+                        if (hasHaste)
+                        {
+                            result *= 1.3;
+                        }
+
+                        return result;
+                    }
+                };
 
             Func<Minion, double> getMinionPower =
-                (livingUnit) => minionBasePower*(livingUnit.Life/(double) livingUnit.MaxLife);
+                (minion) =>
+                {
+                    if (minion.Faction == Tick.Self.Faction)
+                    {
+                        //Пока не будем считать союзных крипов как силу
+                        return 0;
+                    }
+                    else
+                    {
+                        if (minion.Type == MinionType.OrcWoodcutter)
+                        {
+                            if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
+                            {
+                                return minionBasePower;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }
+                        else if (minion.Type == MinionType.FetishBlowdart)
+                        {
+                            if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
+                            {
+                                return minionBasePower;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }
+
+                        return minionBasePower;
+                    }
+                    //return minionBasePower*(minion.Life/(double) minion.MaxLife);
+                };
 
             Func<Building, double> getBuidingPower =
-                (livingUnit) =>
+                (building) =>
                 {
-                    var power = livingUnit.Type == BuildingType.FactionBase ? baseBasePower : towerBasePower;
-                    return power*(livingUnit.Life/(double) livingUnit.MaxLife);
+                    var basePower = building.Type == BuildingType.FactionBase ? baseBasePower : towerBasePower;
+                    if (building.Faction == Tick.Self.Faction)
+                    {
+                        //Пока не будем считать союзных башен как силу
+                        return 0;
+                    }
+                    else
+                    {
+                        if (building.Type == BuildingType.FactionBase)
+                        {
+                            return basePower*
+                                   ((Tick.Game.FactionBaseCooldownTicks - building.RemainingActionCooldownTicks)/
+                                    (double) Tick.Game.FactionBaseCooldownTicks);
+                        }
+                        else
+                        {
+                            return basePower*
+                                   ((Tick.Game.GuardianTowerCooldownTicks - building.RemainingActionCooldownTicks)/
+                                    (double) Tick.Game.GuardianTowerCooldownTicks);
+                        }
+                    }
+                    //return power*(building.Life/(double) building.MaxLife);
                 };
 
             var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyRange, false).Select(x => getWizardPower(x)).Sum();

@@ -37,8 +37,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
         public static Point2D GetPointAt(Point2D startPoint, double angle, double range)
         {
             return new Point2D(
-                startPoint.X - range * Math.Cos(angle + Math.PI /*/ 2*/),
-                startPoint.Y - range * Math.Sin(angle + Math.PI /*/ 2*/)
+                startPoint.X + range * Math.Cos(angle),
+                startPoint.Y + range * Math.Sin(angle)
                 );
         }
     }

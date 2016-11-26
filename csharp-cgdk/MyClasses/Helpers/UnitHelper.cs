@@ -19,7 +19,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
             var nearUnits =
                 allLivingUnits
-                    .Where(x => Tick.Self.GetDistanceTo(x) - x.Radius - Tick.Self.Radius < 5).ToList();
+                    .Where(x => Tick.Self.GetDistanceTo(x) - x.Radius - Tick.Self.Radius <= 10).ToList();
 
             return nearUnits;
         }

@@ -48,20 +48,26 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var firstUnit = stuckedLivingUnins.First();
 
                 var faceForward = Math.Abs(angleToTargetPoint) <= Math.PI/2;
-                if (faceForward)
+                var angle1 = Tick.Self.GetAngleTo(firstUnit);
+
+                var escapeAngle = angle1 <= 0 ? angle1 + Math.PI / 2 : angle1 - Math.PI / 2;
+                var escapeSpeed = faceForward ? Tick.Game.WizardForwardSpeed: - Tick.Game.WizardBackwardSpeed; ;
+                var escapeStrafe = angle1 <= 0 ? Tick.Game.WizardStrafeSpeed : -Tick.Game.WizardStrafeSpeed;
+
+                escapeSpeed = escapeSpeed * Math.Abs(Math.Sin(angle1));
+                escapeStrafe = escapeStrafe * Math.Abs(Math.Cos(angle1));
+
+                Tick.Move.Speed = escapeSpeed;
+                Tick.Move.StrafeSpeed = escapeStrafe;
+
+                DebugTrace.ExecuteVisualizer(() =>
                 {
-                    var randomAngle = random.NextDouble() * Math.PI / 2;
-                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
-                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI / 2 + randomAngle : angle1 - Math.PI / 2 - randomAngle;
-                    Tick.Move.Speed = Tick.Game.WizardForwardSpeed;
-                }
-                else
-                {
-                    var angle1 = Tick.Self.GetAngleTo(firstUnit);
-                    Tick.Move.Turn = angle1 <= 0 ? angle1 + Math.PI / 2 : angle1 - Math.PI / 2;
-                    Tick.Move.Speed = -Tick.Game.WizardBackwardSpeed;
-                }
-             
+                    var endPoint = Point2D.GetPointAt(new Point2D(Tick.Self.X, Tick.Self.Y), Tick.Self.Angle + escapeAngle, 200);
+                    VisualClient.Instance.BeginPost();
+                    VisualClient.Instance.Line(Tick.Self.X, Tick.Self.Y, endPoint.X, endPoint.Y, 0, 1, 1);
+                    VisualClient.Instance.EndPost();
+                });
+
                 //Если застряли надолго пробуем пробить путь вперед
                 if (GameState.StackedTickCount >= 30)
                 {

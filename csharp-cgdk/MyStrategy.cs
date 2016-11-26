@@ -10,15 +10,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
 {
     public sealed class MyStrategy : IStrategy
     {
-        public MyStrategy()
-        {
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-                Debug.connect("127.0.0.1", 13579);
-            });
-        }
-
         public void Move(Wizard self, World world, Game game, Move move)
         {
             FillCurrentTickParamsBeforeStart(self, world, game, move);
@@ -27,9 +18,9 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
 
             DebugTrace.ExecuteVisualizer(() =>
             {
-                Debug.beginPost();
-                Debug.circle(Tick.Self.X, Tick.Self.Y, Tick.Self.CastRange, 50);
-                Debug.endPost();
+                VisualClient.Instance.BeginPost();
+                VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
+                VisualClient.Instance.EndPost();
             });
 
         }
@@ -73,10 +64,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
             {
                 foreach (var projectilesInfo in GameState.ProjectilesInfo)
                 {
-                    Debug.beginPost();
-                    Debug.line(projectilesInfo.Value.StartPoint.X, projectilesInfo.Value.StartPoint.Y,
-                        projectilesInfo.Value.EndPoint.X, projectilesInfo.Value.EndPoint.Y, 0xFF0000);
-                    Debug.endPost();
+                    VisualClient.Instance.BeginPost();
+                    VisualClient.Instance.Line(projectilesInfo.Value.StartPoint.X, projectilesInfo.Value.StartPoint.Y,
+                        projectilesInfo.Value.EndPoint.X, projectilesInfo.Value.EndPoint.Y, 1,0,0);
+                    VisualClient.Instance.EndPost();
                 }
             });
         }

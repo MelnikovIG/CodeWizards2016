@@ -110,11 +110,11 @@
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />
     <Compile Include="MyClasses\Helpers\WayPointsHelper.cs" />
     <Compile Include="MyClasses\Strategy.cs" />
+    <Compile Include="MyClasses\VisualClient.cs" />
     <Compile Include="MyStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteProcessClient.cs" />
     <Compile Include="Runner.cs" />
-    <Compile Include="MyClasses\Debug.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

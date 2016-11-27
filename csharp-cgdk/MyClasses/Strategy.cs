@@ -21,14 +21,21 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
     {
         public static void Execute()
         {
+            Tick.Move.SkillToLearn = SkillsHelper.GetSkillToLearn();
+
+            //DebugTrace.ExecuteVisualizer(() =>
+            //{
+            //    DebugTrace.ConsoleWriteLite($"XP {Tick.Self.Xp} Level {Tick.Self.Level} Skills {string.Join(", ", Tick.Self.Skills)}");
+            //});
+
             var pushPower = GetPushPower();
 
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
-                DebugTrace.ConsoleWriteLite(
-                    $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
-            });
+            //DebugTrace.ExecuteVisualizer(() =>
+            //{
+            //    var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
+            //    DebugTrace.ConsoleWriteLite(
+            //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
+            //});
 
             if (pushPower.FrienlyPower >= pushPower.EnemyPower)
             {

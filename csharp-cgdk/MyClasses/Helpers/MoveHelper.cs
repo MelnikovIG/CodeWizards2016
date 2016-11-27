@@ -25,7 +25,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
             if (nearestTargetPoint == getNearestMyWaypoint)
             {
-                pathNextPoint = nearestTargetPoint.Position;
+                //pathNextPoint = nearestTargetPoint.Position;
+                pathNextPoint = new Point2D(moveToParams.TargetPoint.X, moveToParams.TargetPoint.Y);
             }
             else
             {

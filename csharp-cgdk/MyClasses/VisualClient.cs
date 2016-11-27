@@ -1,4 +1,3 @@
-#if VISUALIZER
 using System;
 using System.Globalization;
 using System.IO;
@@ -215,4 +214,3 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
         }
     }
 }
-#endif

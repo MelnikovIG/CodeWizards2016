@@ -36,11 +36,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 if (target != null)
                 {
                     AtackTarget(target);
-                    MoveHelper.MoveTo(new MoveToParams()
+                    if (target.Faction != Faction.Neutral && target.Faction != Faction.Other)
                     {
-                        TargetPoint = new Point2D(target.X, target.Y),
-                        LookAtPoint = new Point2D(target.X, target.Y),
-                    });
+                        MoveHelper.MoveTo(new MoveToParams()
+                        {
+                            TargetPoint = new Point2D(target.X, target.Y),
+                            LookAtPoint = new Point2D(target.X, target.Y),
+                        });
+                    }
                 }
                 else
                 {
@@ -213,10 +216,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             Func<Wizard, double> getWizardPower =
                 (wizard) =>
                 {
-                    //От создных героев олку мало) сделаем коэфф 0.3
+                    //От создных героев олку мало)
                     if (wizard.Faction == Tick.Self.Faction && !wizard.IsMe)
                     {
-                        return wizardBasePower*0.3;
+                        return wizardBasePower*0.2;
                     }
                     else
                     {
@@ -249,6 +252,43 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     {
                         //Пока не будем считать союзных крипов как силу
                         return 0;
+                    }
+                    else if (minion.Faction == Faction.Neutral || minion.Faction == Faction.Other)
+                    {
+
+                        var isAgressive = minion.SpeedX > 0 || minion.SpeedY > 0 || minion.Life < minion.MaxLife ||
+                                          minion.RemainingActionCooldownTicks > 0;
+
+                        if (isAgressive)
+                        {
+                            if (minion.Type == MinionType.OrcWoodcutter)
+                            {
+                                if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
+                                {
+                                    return minionBasePower;
+                                }
+                                else
+                                {
+                                    return 0;
+                                }
+                            }
+                            else if (minion.Type == MinionType.FetishBlowdart)
+                            {
+                                if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
+                                {
+                                    return minionBasePower;
+                                }
+                                else
+                                {
+                                    return 0;
+                                }
+                            }
+                            return 0;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
                     }
                     else
                     {

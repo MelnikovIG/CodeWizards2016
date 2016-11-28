@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.Model;
@@ -127,17 +128,40 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             {
                 double distance = Tick.Self.GetDistanceTo(targetToAtack);
                 double angle = Tick.Self.GetAngleTo(targetToAtack);
-                if (distance - targetToAtack.Radius <= 70)
+                if (distance - targetToAtack.Radius <= Tick.Game.StaffRange)
                 {
                     // ... то атакуем с руки.
-                    Tick.Move.Action = ActionType.MagicMissile;
+                    Tick.Move.Action = ActionType.Staff;
                     Tick.Move.CastAngle = angle;
                     Tick.Move.MinCastDistance = distance - targetToAtack.Radius + Tick.Game.MagicMissileRadius;
                 }
                 else
                 {
-                    // ... то атакуем палкой.
-                    Tick.Move.Action = ActionType.MagicMissile;
+                    if (targetToAtack is Wizard)
+                    {
+                        var canCastFrostbolt = Tick.Self.Skills.Any(x => x == SkillType.FrostBolt) &&
+                                               Tick.Self.RemainingActionCooldownTicks == 0 &&
+                                               Tick.Self.RemainingCooldownTicksByAction[(int)ActionType.FrostBolt] == 0;
+                        var canCastFireball = Tick.Self.Skills.Any(x => x == SkillType.Fireball) &&
+                                              Tick.Self.RemainingActionCooldownTicks == 0 &&
+                                              Tick.Self.RemainingCooldownTicksByAction[(int)ActionType.Fireball] == 0;
+                        if (canCastFrostbolt)
+                        {
+                            Tick.Move.Action = ActionType.FrostBolt;
+                        }
+                        else if (canCastFireball)
+                        {
+                            Tick.Move.Action = ActionType.Fireball;
+                        }
+                        else
+                        {
+                            Tick.Move.Action = ActionType.MagicMissile;
+                        }
+                    }
+                    else
+                    {
+                        Tick.Move.Action = ActionType.MagicMissile;
+                    }
                     Tick.Move.CastAngle = angle;
                     Tick.Move.MinCastDistance = distance - targetToAtack.Radius + Tick.Game.MagicMissileRadius;
                 }
@@ -202,8 +226,31 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     }
                     else
                     {
-                        // ... то атакуем палкой.
-                        Tick.Move.Action = ActionType.MagicMissile;
+                        if (target is Wizard)
+                        {
+                            var canCastFrostbolt = Tick.Self.Skills.Any(x => x == SkillType.FrostBolt) &&
+                                                   Tick.Self.RemainingActionCooldownTicks == 0 &&
+                                                   Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.FrostBolt] == 0;
+                            var canCastFireball = Tick.Self.Skills.Any(x => x == SkillType.Fireball) &&
+                                                  Tick.Self.RemainingActionCooldownTicks == 0 &&
+                                                  Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.Fireball] == 0;
+                            if (canCastFrostbolt)
+                            {
+                                Tick.Move.Action =ActionType.FrostBolt;
+                            }
+                            else if (canCastFireball)
+                            {
+                                Tick.Move.Action = ActionType.Fireball;
+                            }
+                            else
+                            {
+                                Tick.Move.Action = ActionType.MagicMissile;
+                            }
+                        }
+                        else
+                        {
+                            Tick.Move.Action = ActionType.MagicMissile;
+                        }
                         Tick.Move.CastAngle = angle;
                         Tick.Move.MinCastDistance = distance - target.Radius + Tick.Game.MagicMissileRadius;
                     }

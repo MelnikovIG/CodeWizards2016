@@ -17,7 +17,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static void ExecuteVisualizer(Action action)
         {
-#if VISUALIZER
+#if VISUALIZER_
             action?.Invoke();
 #endif
         }

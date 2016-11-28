@@ -109,6 +109,7 @@
     <Compile Include="MyClasses\Helpers\DebugTrace.cs" />
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />
     <Compile Include="MyClasses\Helpers\WayPointsHelper.cs" />
+    <Compile Include="MyClasses\MapGrid\MapGrid.cs" />
     <Compile Include="MyClasses\Strategy.cs" />
     <Compile Include="MyClasses\VisualClient.cs" />
     <Compile Include="MyStrategy.cs" />

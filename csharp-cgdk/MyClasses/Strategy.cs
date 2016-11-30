@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -37,6 +38,50 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             //    DebugTrace.ConsoleWriteLite(
             //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
             //});
+
+            var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles();
+            if (projectiles.Any())
+            {
+                var firstProjectile = projectiles.First();
+
+                var vectorToProjectile =
+                    new Vector(firstProjectile.NormalInterselectionPoint.X, firstProjectile.NormalInterselectionPoint.Y) -
+                    new Vector(Tick.Self.X, Tick.Self.Y);
+
+                vectorToProjectile.Negate();
+
+                var resultPoint = new Point2D(Tick.Self.X, Tick.Self.Y) + vectorToProjectile;
+
+                var angleToMovePoint = Tick.Self.GetAngleTo(resultPoint.X, resultPoint.Y);
+                var speed = Math.Abs(angleToMovePoint) < Math.PI/2
+                    ? Tick.Game.WizardForwardSpeed
+                    : -Tick.Game.WizardBackwardSpeed;
+
+                var strafeSpeed = angleToMovePoint > 0
+                    ? Tick.Game.WizardStrafeSpeed
+                    : -Tick.Game.WizardStrafeSpeed;
+
+                var a = Math.Abs(Math.Sin(angleToMovePoint));
+                var b = Math.Abs(Math.Cos(angleToMovePoint));
+                speed = speed*b;
+                strafeSpeed = strafeSpeed*a;
+
+                Tick.Move.Speed = speed;
+                Tick.Move.StrafeSpeed = strafeSpeed;
+
+                return;
+            }
+
+            DebugTrace.ExecuteVisualizer(() =>
+            {
+                VisualClient.Instance.BeginPost();
+                projectiles.ForEach(x =>
+                {
+                    VisualClient.Instance.Line(x.StartPoint.X, x.StartPoint.Y,x.EndPoint.X, x.EndPoint.Y, 1, 0, 0);
+                });
+                VisualClient.Instance.EndPost();
+            });
+
 
             if (pushPower.FrienlyPower >= pushPower.EnemyPower)
             {

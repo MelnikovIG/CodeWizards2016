@@ -16,12 +16,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
             Strategy.Execute();
             FillCurrentTickParamsBeforeEnd();
 
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                VisualClient.Instance.BeginPost();
-                VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
-                VisualClient.Instance.EndPost();
-            });
+            //DebugTrace.ExecuteVisualizer(() =>
+            //{
+            //    VisualClient.Instance.BeginPost();
+            //    VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
+            //    VisualClient.Instance.EndPost();
+            //});
 
         }
 
@@ -59,17 +59,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
             {
                 GameState.ProjectilesInfo.Remove(removeItem);
             }
-
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                foreach (var projectilesInfo in GameState.ProjectilesInfo)
-                {
-                    VisualClient.Instance.BeginPost();
-                    VisualClient.Instance.Line(projectilesInfo.Value.StartPoint.X, projectilesInfo.Value.StartPoint.Y,
-                        projectilesInfo.Value.EndPoint.X, projectilesInfo.Value.EndPoint.Y, 1,0,0);
-                    VisualClient.Instance.EndPost();
-                }
-            });
         }
 
         private void FillCurrentTickParamsBeforeEnd()

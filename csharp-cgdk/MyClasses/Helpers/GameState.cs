@@ -23,6 +23,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         public Point2D StartPoint { get; set; }
         public Point2D EndPoint { get; set; }
+        public bool IsInterselect { get; set; }
+        public Point2D NormalInterselectionPoint { get; set; }
     }
 
     public class WizardInfo

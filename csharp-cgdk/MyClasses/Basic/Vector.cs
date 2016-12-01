@@ -45,6 +45,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
                               vector.Y * scalar);
         }
 
+        public static Vector operator /(Vector vector, double scalar)
+        {
+            return (1.0 / scalar) * vector;
+        }
+
         public void Negate()
         {
             X = -X;

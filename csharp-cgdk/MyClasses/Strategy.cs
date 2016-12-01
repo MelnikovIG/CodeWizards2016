@@ -39,48 +39,71 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
             //});
 
-            var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles();
-            if (projectiles.Any())
-            {
-                var firstProjectile = projectiles.First();
+            //Func<ProjectilesInfo, bool> canEscape = projectile =>
+            //{
+            //    var interselectPointRange = projectile.CurrentPoint.GetDistanceTo(projectile.NormalInterselectionPoint);
+            //    var interselectMyRange = Tick.Self.GetDistanceTo(projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y);
+            //    var escapeRange = Tick.Self.Radius - interselectMyRange;
 
-                var vectorToProjectile =
-                    new Vector(firstProjectile.NormalInterselectionPoint.X, firstProjectile.NormalInterselectionPoint.Y) -
-                    new Vector(Tick.Self.X, Tick.Self.Y);
+            //    if (escapeRange < 0)
+            //    {
+            //        return true;
+            //    }
 
-                vectorToProjectile.Negate();
+            //    var projectilesToInterselectTicks = Math.Abs((int)(interselectPointRange / projectile.Speed));
+            //    var escapeTicks = Math.Abs((int)(escapeRange / 3));
+            //    DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
 
-                var resultPoint = new Point2D(Tick.Self.X, Tick.Self.Y) + vectorToProjectile;
+            //    //VisualClient.Instance.Line(projectile.StartPoint.X, projectile.StartPoint.Y, projectile.EndPoint.X, projectile.EndPoint.Y, 0, 1, 0);
+            //    //VisualClient.Instance.Line(projectile.CurrentPoint.X, projectile.CurrentPoint.Y, projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y, 0, 0, 1);
+            //    //VisualClient.Instance.Line(Tick.Self.X, Tick.Self.Y, projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y, 0, 1, 1);
 
-                var angleToMovePoint = Tick.Self.GetAngleTo(resultPoint.X, resultPoint.Y);
-                var speed = Math.Abs(angleToMovePoint) < Math.PI/2
-                    ? Tick.Game.WizardForwardSpeed
-                    : -Tick.Game.WizardBackwardSpeed;
+            //    return escapeTicks <= projectilesToInterselectTicks;
+            //};
 
-                var strafeSpeed = angleToMovePoint > 0
-                    ? Tick.Game.WizardStrafeSpeed
-                    : -Tick.Game.WizardStrafeSpeed;
+            //var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles()
+            //    .Where(canEscape).ToList();
+            //if (projectiles.Any())
+            //{
+            //    var firstProjectile = projectiles.First();
 
-                var a = Math.Abs(Math.Sin(angleToMovePoint));
-                var b = Math.Abs(Math.Cos(angleToMovePoint));
-                speed = speed*b;
-                strafeSpeed = strafeSpeed*a;
+            //    var vectorToProjectile =
+            //        new Vector(firstProjectile.NormalInterselectionPoint.X, firstProjectile.NormalInterselectionPoint.Y) -
+            //        new Vector(Tick.Self.X, Tick.Self.Y);
 
-                Tick.Move.Speed = speed;
-                Tick.Move.StrafeSpeed = strafeSpeed;
+            //    vectorToProjectile.Negate();
 
-                return;
-            }
+            //    var resultPoint = new Point2D(Tick.Self.X, Tick.Self.Y) + 100*vectorToProjectile;
 
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                VisualClient.Instance.BeginPost();
-                projectiles.ForEach(x =>
-                {
-                    VisualClient.Instance.Line(x.StartPoint.X, x.StartPoint.Y,x.EndPoint.X, x.EndPoint.Y, 1, 0, 0);
-                });
-                VisualClient.Instance.EndPost();
-            });
+            //    var target = GetOptimalTargetToAtack(Tick.Self.CastRange);
+            //    if (target != null)
+            //    {
+            //        AtackTarget(target);
+            //    }
+            //    else
+            //    {
+            //        target = GetOptimalTargetToAtack(Tick.Self.CastRange * 1.5);
+            //    }
+
+            //    var moveToParams = new MoveToParams()
+            //    {
+            //        TargetPoint = resultPoint,
+            //        LookAtPoint = target != null ? new Point2D(target.X, target.Y) :null
+            //    };
+            //    MoveHelper.MoveTo(moveToParams);
+
+            //    return;
+            //}
+
+            //DebugTrace.ExecuteVisualizer(() =>
+            //{
+            //    VisualClient.Instance.BeginPost();
+            //    projectiles.ForEach(x =>
+            //    {
+            //        VisualClient.Instance.Line(x.StartPoint.X, x.StartPoint.Y,x.EndPoint.X, x.EndPoint.Y, 1, 0, 0);
+            //    });
+            //    VisualClient.Instance.EndPost();
+            //});
 
 
             if (pushPower.FrienlyPower >= pushPower.EnemyPower)
@@ -89,7 +112,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 if (target != null)
                 {
                     AtackTarget(target);
-                    if (target.Faction != Faction.Neutral && target.Faction != Faction.Other)
+                    if (target.Faction != Faction.Neutral && target.Faction != Faction.Other && Tick.Self.GetDistanceTo(target) > 100)
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {
@@ -305,30 +328,49 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
 
         private static PushPower GetPushPower()
         {
-            var wizardBasePower = 1;
+            var wizardBasePower = 1d;
             var minionBasePower = 0.3;
             var towerBasePower = 0.4;
             var baseBasePower = 0.7;
-            var enemyRange = Tick.Self.CastRange + Tick.Game.WizardRadius * 2;
+            var enemyScanRange = Tick.Game.WizardCastRange + 300;
             var friendRange = Tick.Self.CastRange;
+
+            var myCastRange = Tick.Self.CastRange;
 
             Func<Wizard, double> getWizardPower =
                 (wizard) =>
                 {
-                    //От создных героев олку мало)
+                    //От создных героев толку мало)
                     if (wizard.Faction == Tick.Self.Faction && !wizard.IsMe)
                     {
                         return wizardBasePower*0.2;
                     }
                     else
                     {
+                        if (wizard.Faction != Tick.Self.Faction)
+                        {
+                            if (Tick.Self.GetDistanceTo(wizard) > wizard.CastRange + Tick.Self.Radius*2)
+                            {
+                                return 0;
+                            }
+                        }
+
                         var hasEmpower = wizard.Statuses.Any(x => x.Type == StatusType.Empowered);
                         var hasHaste = wizard.Statuses.Any(x => x.Type == StatusType.Hastened);
                         var hasShield = wizard.Statuses.Any(x => x.Type == StatusType.Shielded);
 
-                        var result = wizardBasePower*(wizard.Life/(double) wizard.MaxLife)*
-                               ((Tick.Game.MagicMissileCooldownTicks - wizard.RemainingCooldownTicksByAction[2])/
-                                (double) Tick.Game.MagicMissileCooldownTicks);
+                        var result = wizardBasePower
+                                     *(wizard.Life/(double) wizard.MaxLife)
+                                     *
+                                     (0.75 + 0.25*(
+                                         ((Tick.Game.MagicMissileCooldownTicks -
+                                           wizard.RemainingCooldownTicksByAction[2])/
+                                          (double) Tick.Game.MagicMissileCooldownTicks)));
+
+                        if (wizard.CastRange > myCastRange)
+                        {
+                            result *= wizard.CastRange/myCastRange;
+                        }
 
                         if (hasEmpower)
                         {
@@ -446,10 +488,15 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     //return power*(building.Life/(double) building.MaxLife);
                 };
 
-            var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyRange, false).Select(x => getWizardPower(x)).Sum();
-            var enemyMinionsPower = UnitHelper.GetNearestMinions(enemyRange, false).Select(x => getMinionPower(x)).Sum();
-            var enemyTowersPower = UnitHelper.GetNearestBuidigs(enemyRange, false).Select(x => getBuidingPower(x)).Sum();
+            var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyScanRange, false).Select(x => getWizardPower(x)).Sum();
+            var enemyMinionsPower = UnitHelper.GetNearestMinions(enemyScanRange, false).Select(x => getMinionPower(x)).Sum();
+            var enemyTowersPower = UnitHelper.GetNearestBuidigs(enemyScanRange, false).Select(x => getBuidingPower(x)).Sum();
             var enemyPower = enemyWizardsPower + enemyMinionsPower + enemyTowersPower;
+
+
+            //var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles()
+            //    .ToList();
+            //projectiles.ForEach(x => { enemyPower *= 1.1; });
 
             var friendlyWizardsPower = UnitHelper.GetNearestWizards(friendRange, true).Select(x => getWizardPower(x)).Sum();
             var friendlyMinionsPower = UnitHelper.GetNearestMinions(friendRange, true).Select(x => getMinionPower(x)).Sum();

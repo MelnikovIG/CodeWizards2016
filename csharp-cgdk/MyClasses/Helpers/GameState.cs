@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.Model;
 using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic;
 
 namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
@@ -23,6 +24,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         public Point2D StartPoint { get; set; }
         public Point2D EndPoint { get; set; }
+        public ProjectileType Type { get; set; }
+        public Point2D CurrentPoint { get; set; }
+        public double Speed { get; set; }
+
         public bool IsInterselect { get; set; }
         public Point2D NormalInterselectionPoint { get; set; }
     }
@@ -30,5 +35,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     public class WizardInfo
     {
         public Point2D Position { get; set; }
+        public double CastRange { get; set; }
     }
 }

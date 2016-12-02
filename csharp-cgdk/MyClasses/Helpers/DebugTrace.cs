@@ -12,7 +12,9 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         public static void ConsoleWriteLite(string s)
         {
+#if VISUALIZER_
             Console.WriteLine(s);
+#endif
         }
 
         public static void ExecuteVisualizer(Action action)

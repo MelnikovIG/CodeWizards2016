@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -16,17 +17,19 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
             Strategy.Execute();
             FillCurrentTickParamsBeforeEnd();
 
-            DebugTrace.ExecuteVisualizer(() =>
-            {
-                VisualClient.Instance.BeginPost();
-                VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
-                VisualClient.Instance.EndPost();
-            });
+            //DebugTrace.ExecuteVisualizer(() =>
+            //{
+            //    VisualClient.Instance.BeginPost();
+            //    VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
+            //    VisualClient.Instance.EndPost();
+            //});
 
         }
 
         private void FillCurrentTickParamsBeforeStart(Wizard self, World world, Game game, Move move)
         {
+            //VisualClient.Instance.BeginPost();
+
             Tick.UpdateTick(self, world, game, move);
 
             var allyWizards = Tick.World.Wizards.Where(x => x.Faction == Tick.Self.Faction);
@@ -35,23 +38,33 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
             var currentWorldProjectiles =
                 Tick.World.Projectiles.Where(x => Tick.Self.GetDistanceTo(x) < projectilesCacheRange)
                     .Where(x => !allyWizardsIds.Contains(x.OwnerPlayerId))
-                    .Where(x => x.Type == ProjectileType.MagicMissile).ToList();
+                    .Where(x => x.Type == ProjectileType.MagicMissile || x.Type == ProjectileType.FrostBolt || x.Type == ProjectileType.Fireball).ToList();
             var prevTickProjectilesIds = GameState.ProjectilesInfo.Select(x => x.Key).ToList();
             var projectilesToRemove =
                 prevTickProjectilesIds.Where(x => !currentWorldProjectiles.Select(y => y.Id).Contains(x)).ToList();
             var projectilesToAdd = currentWorldProjectiles.Where(x => !prevTickProjectilesIds.Contains(x.Id)).ToList();
             foreach (var projectile in projectilesToAdd)
             {
-                var startPoint = GameState.WizardsLastPositions.ContainsKey(projectile.OwnerPlayerId)
-                    ? GameState.WizardsLastPositions[projectile.OwnerPlayerId].Position
+                var wizardInfo = GameState.WizardsLastPositions.ContainsKey(projectile.OwnerPlayerId)
+                    ? GameState.WizardsLastPositions[projectile.OwnerPlayerId]
+                    : null;
+
+                var startPoint = wizardInfo != null
+                    ? wizardInfo.Position
                     : new Point2D(projectile.X, projectile.Y);
 
-                var endPoint = Point2D.GetPointAt(startPoint, projectile.Angle, Tick.Self.CastRange);
+                var castRange = wizardInfo != null
+                    ? wizardInfo.CastRange
+                    : 700;
+
+                var endPoint = Point2D.GetPointAt(startPoint, projectile.Angle, castRange + 100);
 
                 GameState.ProjectilesInfo.Add(projectile.Id, new ProjectilesInfo()
                 {
                     StartPoint = startPoint,
-                    EndPoint = endPoint
+                    EndPoint = endPoint,
+                    Speed = Math.Sqrt(Math.Pow(projectile.SpeedX,2) + Math.Pow(projectile.SpeedY, 2)),//new Vector(projectile.SpeedX, projectile.SpeedY),
+                    Type = projectile.Type
                 });
             }
 
@@ -60,22 +73,23 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
                 GameState.ProjectilesInfo.Remove(removeItem);
             }
 
-            DebugTrace.ExecuteVisualizer(() =>
+            foreach (var currentWorldProjectile in currentWorldProjectiles)
             {
-                foreach (var projectilesInfo in GameState.ProjectilesInfo)
-                {
-                    VisualClient.Instance.BeginPost();
-                    VisualClient.Instance.Line(projectilesInfo.Value.StartPoint.X, projectilesInfo.Value.StartPoint.Y,
-                        projectilesInfo.Value.EndPoint.X, projectilesInfo.Value.EndPoint.Y, 1,0,0);
-                    VisualClient.Instance.EndPost();
-                }
-            });
+                GameState.ProjectilesInfo[currentWorldProjectile.Id].CurrentPoint =
+                    new Point2D(currentWorldProjectile.X, currentWorldProjectile.Y);
+            }
         }
 
         private void FillCurrentTickParamsBeforeEnd()
         {
             GameState.WizardsLastPositions = Tick.World.Wizards.ToDictionary(x => x.OwnerPlayerId,
-                x => new WizardInfo() {Position = new Point2D(x.X, x.Y)});
+                x => new WizardInfo()
+                {
+                    Position = new Point2D(x.X, x.Y),
+                    CastRange = x.CastRange
+                });
+
+            //VisualClient.Instance.EndPost();
         }
     }
 }

@@ -170,7 +170,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
             var projectilesToInterselectTicks = Math.Abs( /*(int)*/ (interselectPointRange/projectile.Speed));
             var escapeTicks = Math.Abs( /*(int)*/ (distanceToEscape/wizardSpeed));
-            DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
+            //DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
 
             return escapeTicks <= projectilesToInterselectTicks;
         }

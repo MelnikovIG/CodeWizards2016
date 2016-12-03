@@ -57,14 +57,16 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
                     ? wizardInfo.CastRange
                     : 700;
 
-                var endPoint = Point2D.GetPointAt(startPoint, projectile.Angle, castRange + 100);
+                var endPoint = Point2D.GetPointAt(startPoint, projectile.Angle, castRange);
 
                 GameState.ProjectilesInfo.Add(projectile.Id, new ProjectilesInfo()
                 {
                     StartPoint = startPoint,
                     EndPoint = endPoint,
                     Speed = Math.Sqrt(Math.Pow(projectile.SpeedX,2) + Math.Pow(projectile.SpeedY, 2)),//new Vector(projectile.SpeedX, projectile.SpeedY),
-                    Type = projectile.Type
+                    Type = projectile.Type,
+                    Radius = projectile.Radius,
+                    Angle = projectile.Angle
                 });
             }
 

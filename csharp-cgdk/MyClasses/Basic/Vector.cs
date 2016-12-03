@@ -14,6 +14,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
             Y = y;
         }
 
+        public Vector(Point2D point)
+        {
+            X = point.X;
+            Y = point.Y;
+        }
+
         public double X { get; set; }
         public double Y { get; set; }
 
@@ -55,5 +61,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
             X = -X;
             Y = -Y;
         }
+
+        public double Length => Math.Sqrt(X * X + Y * Y);
     }
 }

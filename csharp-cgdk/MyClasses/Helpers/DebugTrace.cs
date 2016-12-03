@@ -12,8 +12,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     {
         public static void ConsoleWriteLite(string s)
         {
-#if VISUALIZER_
-            Console.WriteLine(s);
+#if VISUALIZER
+            if (Tick.Self.Id == 1)
+            {
+                Console.WriteLine(s);
+            }
 #endif
         }
 

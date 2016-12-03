@@ -27,9 +27,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         public ProjectileType Type { get; set; }
         public Point2D CurrentPoint { get; set; }
         public double Speed { get; set; }
+        public double Radius { get; set; }
+        public double Angle { get; set; }
 
-        public bool IsInterselect { get; set; }
-        public Point2D NormalInterselectionPoint { get; set; }
+        public bool IsInDangerZone { get; set; }
+        public bool CanEvade { get; set; }
+        public Vector EvadeVector { get; set; }
     }
 
     public class WizardInfo

@@ -39,72 +39,22 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
             //});
 
-            //Func<ProjectilesInfo, bool> canEscape = projectile =>
-            //{
-            //    var interselectPointRange = projectile.CurrentPoint.GetDistanceTo(projectile.NormalInterselectionPoint);
-            //    var interselectMyRange = Tick.Self.GetDistanceTo(projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y);
-            //    var escapeRange = Tick.Self.Radius - interselectMyRange;
+            var evideableProjectiles = ProjectilesHelper.GetEvideableProjectiles();
+            if (evideableProjectiles.Any())
+            {
+                //TODO: evide frostbolt first?
+                var firstEvideableProjectile = evideableProjectiles.First();
+                var evideVector = firstEvideableProjectile.EvadeVector;
 
-            //    if (escapeRange < 0)
-            //    {
-            //        return true;
-            //    }
-
-            //    var projectilesToInterselectTicks = Math.Abs((int)(interselectPointRange / projectile.Speed));
-            //    var escapeTicks = Math.Abs((int)(escapeRange / 3));
-            //    DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
-
-            //    //VisualClient.Instance.Line(projectile.StartPoint.X, projectile.StartPoint.Y, projectile.EndPoint.X, projectile.EndPoint.Y, 0, 1, 0);
-            //    //VisualClient.Instance.Line(projectile.CurrentPoint.X, projectile.CurrentPoint.Y, projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y, 0, 0, 1);
-            //    //VisualClient.Instance.Line(Tick.Self.X, Tick.Self.Y, projectile.NormalInterselectionPoint.X, projectile.NormalInterselectionPoint.Y, 0, 1, 1);
-
-            //    return escapeTicks <= projectilesToInterselectTicks;
-            //};
-
-            //var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles()
-            //    .Where(canEscape).ToList();
-            //if (projectiles.Any())
-            //{
-            //    var firstProjectile = projectiles.First();
-
-            //    var vectorToProjectile =
-            //        new Vector(firstProjectile.NormalInterselectionPoint.X, firstProjectile.NormalInterselectionPoint.Y) -
-            //        new Vector(Tick.Self.X, Tick.Self.Y);
-
-            //    vectorToProjectile.Negate();
-
-            //    var resultPoint = new Point2D(Tick.Self.X, Tick.Self.Y) + 100*vectorToProjectile;
-
-            //    var target = GetOptimalTargetToAtack(Tick.Self.CastRange);
-            //    if (target != null)
-            //    {
-            //        AtackTarget(target);
-            //    }
-            //    else
-            //    {
-            //        target = GetOptimalTargetToAtack(Tick.Self.CastRange * 1.5);
-            //    }
-
-            //    var moveToParams = new MoveToParams()
-            //    {
-            //        TargetPoint = resultPoint,
-            //        LookAtPoint = target != null ? new Point2D(target.X, target.Y) :null
-            //    };
-            //    MoveHelper.MoveTo(moveToParams);
-
-            //    return;
-            //}
-
-            //DebugTrace.ExecuteVisualizer(() =>
-            //{
-            //    VisualClient.Instance.BeginPost();
-            //    projectiles.ForEach(x =>
-            //    {
-            //        VisualClient.Instance.Line(x.StartPoint.X, x.StartPoint.Y,x.EndPoint.X, x.EndPoint.Y, 1, 0, 0);
-            //    });
-            //    VisualClient.Instance.EndPost();
-            //});
-
+                var evdePoint = new Point2D(Tick.Self.X, Tick.Self.Y) + evideVector;
+                var moveToParams = new MoveToParams()
+                {
+                    TargetPoint = evdePoint,
+                    //LookAtPoint = new Point2D(0, Tick.Game.MapSize)
+                };
+                MoveHelper.MoveTo(moveToParams);
+                return;
+            }
 
             if (pushPower.FrienlyPower >= pushPower.EnemyPower)
             {
@@ -112,7 +62,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 if (target != null)
                 {
                     AtackTarget(target);
-                    if (target.Faction != Faction.Neutral && target.Faction != Faction.Other && Tick.Self.GetDistanceTo(target) > 100)
+                    if (target.Faction != Faction.Neutral && target.Faction != Faction.Other &&
+                        Tick.Self.GetDistanceTo(target) > Tick.Self.CastRange * 0.8)
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {

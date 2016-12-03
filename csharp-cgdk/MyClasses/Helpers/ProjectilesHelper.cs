@@ -66,7 +66,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 if (IsInterselectByHead(projectileInfo, additionalDangerZone))
                 {
                     isInDangerZone = true;
-                    canEvade = CanEvadeFromInterselectPointHead(projectileInfo, out evadeVector);
+                    canEvade = CanEvadeFromInterselectPointHead(projectileInfo);
+                    evadeVector = GetEvadeVector(projectileInfo.EndPoint);
                     //VisualClient.Instance.Line(Tick.Self.GetPositionPoint(), Tick.Self.GetPositionPoint()+ evadeVector, 0,1,0);
                 }
 
@@ -91,6 +92,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         //Считаем что есть если мы в зоне поражения радиуса конца выстрела  + буфер
         private static bool IsInterselectByHead(ProjectilesInfo projectileInfo, double additionalDangerZone)
         {
+            var v1 = new Vector(Tick.Self.GetPositionPoint()) - new Vector(projectileInfo.EndPoint);
+            var v2 = new Vector(projectileInfo.StartPoint) - new Vector(projectileInfo.EndPoint);
+            if (Math.Abs(Vector.AngleBetween(v1, v2)) < Math.PI/2)
+            {
+                return false;
+            }
+
             return Tick.Self.GetDistanceTo(projectileInfo.EndPoint.X, projectileInfo.EndPoint.Y) - Tick.Self.Radius -
                    projectileInfo.Radius - additionalDangerZone <= 0;
         }
@@ -136,22 +144,22 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         //    return escapeTicks <= projectilesToInterselectTicks;
         //}
 
-        private static bool CanEvadeFromInterselectPointHead(ProjectilesInfo projectile, out Vector safeZoneVector)
+        private static bool CanEvadeFromInterselectPointHead(ProjectilesInfo projectile)
         {
             var interselectPointRange = projectile.CurrentPoint.GetDistanceTo(projectile.EndPoint);
 
             var safeDistance = Tick.Self.Radius + projectile.Radius;
-            var projectileVector = new Vector(projectile.EndPoint) - new Vector(projectile.StartPoint);
-            var projectileVectorLength = projectileVector.Length;
-            var multiplier = (projectileVectorLength + safeDistance) / projectileVectorLength;
-            safeZoneVector = multiplier * projectileVector;
-            var safePoint = projectile.StartPoint + safeZoneVector;
+            var evadeVector =
+                new Vector(projectile.EndPoint) -
+                new Vector(Tick.Self.GetPositionPoint());
+            evadeVector.Negate();
+            evadeVector.Normalize();
+            evadeVector = safeDistance*evadeVector;
+            var safePoint = projectile.EndPoint + evadeVector;
 
             //VisualClient.Instance.Circle(safePoint.X,safePoint.Y, 5, 1,0,0);
 
-            var interselectMyRange = Tick.Self.GetDistanceTo(safePoint.X, safePoint.Y);
-
-            var distanceToEscape = interselectMyRange;
+            var distanceToEscape = Tick.Self.GetDistanceTo(safePoint.X, safePoint.Y);
             //var distanceToEscape = Tick.Self.Radius + projectile.Radius - interselectMyRange;
             //if (distanceToEscape < 0)
             //{
@@ -160,8 +168,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
             var wizardSpeed = 3;
 
-            var projectilesToInterselectTicks = Math.Abs(/*(int)*/ (interselectPointRange / projectile.Speed));
-            var escapeTicks = Math.Abs(/*(int)*/ (distanceToEscape / wizardSpeed));
+            var projectilesToInterselectTicks = Math.Abs( /*(int)*/ (interselectPointRange/projectile.Speed));
+            var escapeTicks = Math.Abs( /*(int)*/ (distanceToEscape/wizardSpeed));
             DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
 
             return escapeTicks <= projectilesToInterselectTicks;

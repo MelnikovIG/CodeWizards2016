@@ -63,5 +63,20 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
         }
 
         public double Length => Math.Sqrt(X * X + Y * Y);
+
+        public static double AngleBetween(Vector vector1, Vector vector2)
+        {
+            double sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
+            double cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
+
+            return Math.Atan2(sin, cos) * (180 / Math.PI);
+        }
+
+        public void Normalize()
+        {
+            // Avoid overflow
+            this /= Math.Max(Math.Abs(X), Math.Abs(Y));
+            this /= Length;
+        }
     }
 }

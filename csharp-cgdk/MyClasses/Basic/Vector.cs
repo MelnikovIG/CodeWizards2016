@@ -64,12 +64,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic
 
         public double Length => Math.Sqrt(X * X + Y * Y);
 
-        public static double AngleBetween(Vector vector1, Vector vector2)
+        public static double AngleBetweenInRadians(Vector vector1, Vector vector2)
         {
             double sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
             double cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
 
-            return Math.Atan2(sin, cos) * (180 / Math.PI);
+            return Math.Atan2(sin, cos);
+        }
+
+        public static double AngleBetweenInDegrees(Vector vector1, Vector vector2)
+        {
+            return AngleBetweenInRadians(vector1, vector2)*(180/Math.PI);
         }
 
         public void Normalize()

@@ -55,7 +55,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
 
                 var castRange = wizardInfo != null
                     ? wizardInfo.CastRange
-                    : 700;
+                    : Tick.Self.VisionRange;
 
                 var endPoint = Point2D.GetPointAt(startPoint, projectile.Angle, castRange);
 

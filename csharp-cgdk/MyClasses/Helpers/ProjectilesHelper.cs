@@ -51,24 +51,34 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
                 var projectileInfo = projectileInfoPair.Value;
 
+                var v1 = new Vector(Tick.Self.GetPositionPoint()) - new Vector(projectileInfo.EndPoint);
+                var v2 = new Vector(projectileInfo.StartPoint) - new Vector(projectileInfo.EndPoint);
+                var angleBetweenVectors = Math.Abs(Vector.AngleBetweenInRadians(v1, v2));
+
+                //DebugTrace.ConsoleWriteLite($"angleBetweenVectors {angleBetweenVectors.ToString("N3")}");
                 //VisualClient.Instance.Line(projectileInfo.StartPoint, projectileInfo.EndPoint, 0, 0, 1);
 
-                //Point2D normalInterselectionPoint;
-                //var isInterselectByNormal = IsInterselectByNormal(projectileInfo, out normalInterselectionPoint);
-                //if (isInterselectByNormal)
-                //{
-                //    isInDangerZone = selfPoint.GetDistanceTo(normalInterselectionPoint) - Tick.Self.Radius -
-                //                         projectileInfo.Radius - additionalDangerZone <= 0;
-                //    canEvade = CanEvadeFromInterselectPoint(projectileInfo, normalInterselectionPoint);
-                //    evadeVector = GetEvadeVector(normalInterselectionPoint);
-                //}
-
-                if (IsInterselectByHead(projectileInfo, additionalDangerZone))
+                if (angleBetweenVectors < Math.PI/2)
                 {
-                    isInDangerZone = true;
-                    canEvade = CanEvadeFromInterselectPointHead(projectileInfo);
-                    evadeVector = GetEvadeVector(projectileInfo.EndPoint);
-                    //VisualClient.Instance.Line(Tick.Self.GetPositionPoint(), Tick.Self.GetPositionPoint()+ evadeVector, 0,1,0);
+                    Point2D normalInterselectionPoint;
+                    var isInterselectByNormal = IsInterselectByNormal(projectileInfo, out normalInterselectionPoint);
+                    if (isInterselectByNormal)
+                    {
+                        isInDangerZone = selfPoint.GetDistanceTo(normalInterselectionPoint) - Tick.Self.Radius -
+                                             projectileInfo.Radius - additionalDangerZone <= 0;
+                        canEvade = CanEvadeFromInterselectPoint(projectileInfo, normalInterselectionPoint);
+                        evadeVector = GetEvadeVector(normalInterselectionPoint);
+                    }
+                }
+                else
+                {
+                    if (IsInterselectByHead(projectileInfo, additionalDangerZone))
+                    {
+                        isInDangerZone = true;
+                        canEvade = CanEvadeFromInterselectPointHead(projectileInfo);
+                        evadeVector = GetEvadeVector(projectileInfo.EndPoint);
+                        //VisualClient.Instance.Line(Tick.Self.GetPositionPoint(), Tick.Self.GetPositionPoint()+ evadeVector, 0,1,0);
+                    }
                 }
 
                 projectileInfo.IsInDangerZone = isInDangerZone;
@@ -92,57 +102,50 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         //Считаем что есть если мы в зоне поражения радиуса конца выстрела  + буфер
         private static bool IsInterselectByHead(ProjectilesInfo projectileInfo, double additionalDangerZone)
         {
-            var v1 = new Vector(Tick.Self.GetPositionPoint()) - new Vector(projectileInfo.EndPoint);
-            var v2 = new Vector(projectileInfo.StartPoint) - new Vector(projectileInfo.EndPoint);
-            if (Math.Abs(Vector.AngleBetween(v1, v2)) < Math.PI/2)
-            {
-                return false;
-            }
-
             return Tick.Self.GetDistanceTo(projectileInfo.EndPoint.X, projectileInfo.EndPoint.Y) - Tick.Self.Radius -
                    projectileInfo.Radius - additionalDangerZone <= 0;
         }
 
-        ////Есть ли нормаль к вектору
-        //private static bool IsInterselectByNormal(ProjectilesInfo projectileInfo, out Point2D normalInterselectionPoint)
-        //{
-        //    var p1 = projectileInfo.StartPoint;
-        //    var p2 = projectileInfo.EndPoint;
+        //Есть ли нормаль к вектору
+        private static bool IsInterselectByNormal(ProjectilesInfo projectileInfo, out Point2D normalInterselectionPoint)
+        {
+            var p1 = projectileInfo.StartPoint;
+            var p2 = projectileInfo.EndPoint;
 
-        //    var me = new Vector(Tick.Self.X, Tick.Self.Y);
-        //    var xy1 = new Vector(p1.X, p1.Y);
-        //    var xy2 = new Vector(p2.X, p2.Y);
+            var me = new Vector(Tick.Self.X, Tick.Self.Y);
+            var xy1 = new Vector(p1.X, p1.Y);
+            var xy2 = new Vector(p2.X, p2.Y);
 
-        //    var v0 = me - xy1;
-        //    var v2 = xy2 - xy1;
+            var v0 = me - xy1;
+            var v2 = xy2 - xy1;
 
-        //    var scalar = (v0 * v2) / (v2 * v2);
+            var scalar = (v0 * v2) / (v2 * v2);
 
-        //    normalInterselectionPoint = p1 + scalar * v2;
+            normalInterselectionPoint = p1 + scalar * v2;
 
-        //    var isInterselect = scalar > 0 && scalar < 1;
-        //    return isInterselect;
-        //}
+            var isInterselect = scalar > 0 && scalar < 1;
+            return isInterselect;
+        }
 
-        //private static bool CanEvadeFromInterselectPoint(ProjectilesInfo projectile, Point2D interselectPoint)
-        //{
-        //    var interselectPointRange = projectile.CurrentPoint.GetDistanceTo(interselectPoint);
-        //    var interselectMyRange = Tick.Self.GetDistanceTo(interselectPoint.X, interselectPoint.Y);
+        private static bool CanEvadeFromInterselectPoint(ProjectilesInfo projectile, Point2D interselectPoint)
+        {
+            var interselectPointRange = projectile.CurrentPoint.GetDistanceTo(interselectPoint);
+            var interselectMyRange = Tick.Self.GetDistanceTo(interselectPoint.X, interselectPoint.Y);
 
-        //    var distanceToEscape = Tick.Self.Radius + projectile.Radius - interselectMyRange;
-        //    if (distanceToEscape < 0)
-        //    {
-        //        return true;
-        //    }
+            var distanceToEscape = Tick.Self.Radius + projectile.Radius - interselectMyRange;
+            if (distanceToEscape < 0)
+            {
+                return true;
+            }
 
-        //    var wizardSpeed = 3;
+            var wizardSpeed = 3;
 
-        //    var projectilesToInterselectTicks = Math.Abs(/*(int)*/ (interselectPointRange/projectile.Speed));
-        //    var escapeTicks = Math.Abs(/*(int)*/ (distanceToEscape / wizardSpeed));
-        //    DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
+            var projectilesToInterselectTicks = Math.Abs(/*(int)*/ (interselectPointRange / projectile.Speed));
+            var escapeTicks = Math.Abs(/*(int)*/ (distanceToEscape / wizardSpeed));
+            //DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
 
-        //    return escapeTicks <= projectilesToInterselectTicks;
-        //}
+            return escapeTicks <= projectilesToInterselectTicks;
+        }
 
         private static bool CanEvadeFromInterselectPointHead(ProjectilesInfo projectile)
         {

@@ -8,23 +8,19 @@ using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic;
 
 namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
-    public static class DebugTrace
+    public static class DebugHelper
     {
+        private static bool DebugEnabled = true;
+        private static readonly long[] DebugWizardIds = {1};
+
+        public static bool CanDebug = DebugEnabled && (DebugWizardIds == null || Array.IndexOf(DebugWizardIds, Tick.Self.Id) >= 0);
+
         public static void ConsoleWriteLite(string s)
         {
-#if VISUALIZER
-            if (Tick.Self.Id == 1)
+            if (CanDebug)
             {
                 Console.WriteLine(s);
             }
-#endif
-        }
-
-        public static void ExecuteVisualizer(Action action)
-        {
-#if VISUALIZER_
-            action?.Invoke();
-#endif
         }
     }
 }

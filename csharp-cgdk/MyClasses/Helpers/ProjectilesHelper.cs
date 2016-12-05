@@ -56,7 +56,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var angleBetweenVectors = Math.Abs(Vector.AngleBetweenInRadians(v1, v2));
 
                 //DebugTrace.ConsoleWriteLite($"angleBetweenVectors {angleBetweenVectors.ToString("N3")}");
-                //VisualClient.Instance.Line(projectileInfo.StartPoint, projectileInfo.EndPoint, 0, 0, 1);
+                //VisualClientHelper.Line(projectileInfo.StartPoint, projectileInfo.EndPoint, 0, 0, 1);
 
                 if (angleBetweenVectors < Math.PI/2)
                 {
@@ -77,7 +77,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                         isInDangerZone = true;
                         canEvade = CanEvadeFromInterselectPointHead(projectileInfo);
                         evadeVector = GetEvadeVector(projectileInfo.EndPoint);
-                        //VisualClient.Instance.Line(Tick.Self.GetPositionPoint(), Tick.Self.GetPositionPoint()+ evadeVector, 0,1,0);
+                        //VisualClientHelper.Line(Tick.Self.GetPositionPoint(), Tick.Self.GetPositionPoint()+ evadeVector, 0,1,0);
                     }
                 }
 
@@ -160,7 +160,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             evadeVector = safeDistance*evadeVector;
             var safePoint = projectile.EndPoint + evadeVector;
 
-            //VisualClient.Instance.Circle(safePoint.X,safePoint.Y, 5, 1,0,0);
+            //VisualClientHelper.Circle(safePoint.X,safePoint.Y, 5, 1,0,0);
 
             var distanceToEscape = Tick.Self.GetDistanceTo(safePoint.X, safePoint.Y);
             //var distanceToEscape = Tick.Self.Radius + projectile.Radius - interselectMyRange;

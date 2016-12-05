@@ -64,9 +64,9 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 //DebugTrace.ExecuteVisualizer(() =>
                 //{
                 //    var endPoint = Point2D.GetPointAt(new Point2D(Tick.Self.X, Tick.Self.Y), Tick.Self.Angle + escapeAngle, 200);
-                //    VisualClient.Instance.BeginPost();
-                //    VisualClient.Instance.Line(Tick.Self.X, Tick.Self.Y, endPoint.X, endPoint.Y, 0, 1, 1);
-                //    VisualClient.Instance.EndPost();
+                //    VisualClientHelper.BeginPost();
+                //    VisualClientHelper.Line(Tick.Self.X, Tick.Self.Y, endPoint.X, endPoint.Y, 0, 1, 1);
+                //    VisualClientHelper.EndPost();
                 //});
 
                 //Если застряли надолго пробуем пробить путь вперед

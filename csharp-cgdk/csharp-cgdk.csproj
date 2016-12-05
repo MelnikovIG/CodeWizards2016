@@ -38,7 +38,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;VISUALIZER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
@@ -108,8 +108,9 @@
     <Compile Include="MyClasses\Helpers\ProjectilesHelper.cs" />
     <Compile Include="MyClasses\Helpers\Skills.cs" />
     <Compile Include="MyClasses\Helpers\TickHelper.cs" />
-    <Compile Include="MyClasses\Helpers\DebugTrace.cs" />
+    <Compile Include="MyClasses\Helpers\DebugHelper.cs" />
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />
+    <Compile Include="MyClasses\Helpers\VisualClientHelper.cs" />
     <Compile Include="MyClasses\Helpers\WayPointsHelper.cs" />
     <Compile Include="MyClasses\MapGrid\MapGrid.cs" />
     <Compile Include="MyClasses\Strategy.cs" />

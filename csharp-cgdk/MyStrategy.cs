@@ -15,22 +15,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
         {
             FillCurrentTickParamsBeforeStart(self, world, game, move);
             Strategy.Execute();
+
+            VisualClientHelper.Circle(Tick.Self.GetPositionPoint(), (float)Tick.Self.CastRange, new VisualClientColor(0,0,1));
+
             FillCurrentTickParamsBeforeEnd();
-
-            //DebugTrace.ExecuteVisualizer(() =>
-            //{
-            //    VisualClient.Instance.BeginPost();
-            //    VisualClient.Instance.Circle(Tick.Self.X, Tick.Self.Y, (float)Tick.Self.CastRange, 0,0,1);
-            //    VisualClient.Instance.EndPost();
-            //});
-
         }
 
         private void FillCurrentTickParamsBeforeStart(Wizard self, World world, Game game, Move move)
         {
-            //VisualClient.Instance.BeginPost();
-
             Tick.UpdateTick(self, world, game, move);
+
+            VisualClientHelper.BeginPost();
 
             var allyWizards = Tick.World.Wizards.Where(x => x.Faction == Tick.Self.Faction);
             var allyWizardsIds = allyWizards.Select(x => x.OwnerPlayerId).ToList();
@@ -91,7 +86,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk
                     CastRange = x.CastRange
                 });
 
-            //VisualClient.Instance.EndPost();
+            VisualClientHelper.EndPost();
         }
     }
 }

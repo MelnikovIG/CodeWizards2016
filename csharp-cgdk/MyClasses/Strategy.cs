@@ -41,7 +41,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             else
             {
                 //Первые 10 тиков ждем команду мастера, определяемся с лайном
-                if (Tick.Game.TickCount < 10)
+                if (Tick.World.TickIndex < 10)
                 {
                     if (Tick.Self.Messages != null && Tick.Self.Messages.Length > 0)
                     {

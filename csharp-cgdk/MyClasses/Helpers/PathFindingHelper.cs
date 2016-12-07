@@ -53,17 +53,43 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             {
                 var p1 = (int)nearestMinion.X / gridStep;
                 var p2 = (int)nearestMinion.Y / gridStep;
-                DrawFilledCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius * 2/3) / gridStep, gridSize, MovableMatrix);
+                DrawFilledCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius) / gridStep, gridSize, MovableMatrix);
             }
 
             BaseGrid searchGrid = new StaticGrid(gridSize, gridSize, MovableMatrix);
-
 
             var startGridPos = GetGridPosByPoint2d(start, gridStep);
             var endGridPos = GetGridPosByPoint2d(end, gridStep);
             if (!searchGrid.IsWalkableAt(endGridPos))
             {
-                return null;
+                var nearResult = (GridPos)null;
+
+                var testRange = 7;
+
+                //TODO: проверить на границы
+                //Клетка цели занята, поищем рядом в радиусе 3х клеток свободные
+                for (int i = -testRange; i < testRange; i++)
+                {
+                    for (int j = -testRange; j < testRange; j++)
+                    {
+                        var isWalkable = searchGrid.IsWalkableAt(new GridPos(endGridPos.x + i, endGridPos.y + j));
+                        if (isWalkable)
+                        {
+                            nearResult = new GridPos(endGridPos.x + i, endGridPos.y + j);
+                            break;
+                        }
+                    }
+                }
+
+
+                if (nearResult == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    endGridPos = nearResult;
+                }
             }
 
 
@@ -106,14 +132,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static void DrawPath(List<GridPos> path, int step)
         {
-            path.ForEach(
-                x =>
-                {
-                    var p1 = x.x;
-                    var p2 = x.y;
-                    VisualClient.Instance.Rect(p1*step, p2*step, (p1 + 1)*step, (p2 + 1)*step, 0, 1, 1);
-                }
-                );
+            //path.ForEach(
+            //    x =>
+            //    {
+            //        var p1 = x.x;
+            //        var p2 = x.y;
+            //        VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step), new VisualClientColor(0,1,1) );
+            //    }
+            //    );
         }
 
         //public static void DrawWaypoints()

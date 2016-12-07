@@ -58,6 +58,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 VisualClient.Instance.Circle(x, y, radius, r, g, b);
             }
         }
+
+        public static void Rect(Point2D p1, Point2D p2, VisualClientColor color)
+        {
+            if (DebugHelper.CanDebug)
+            {
+                VisualClient.Instance.Rect(p1.X, p1.Y, p2.X, p2.Y, color.r, color.g, color.b);
+            }
+        }
     }
 
     public struct VisualClientColor

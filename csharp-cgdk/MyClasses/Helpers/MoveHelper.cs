@@ -11,21 +11,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
     public static class MoveHelper
     {
-        private static Random random = new Random();
-
         public static void MoveTo(MoveToParams moveToParams)
         {
-
             var nearestTargetPoint = GetNearestWayPointForPoint(moveToParams.TargetPoint);
 
-            var myPosition = new Point2D(Tick.Self.X, Tick.Self.Y);
+            var myPosition = Tick.Self.GetPositionPoint();
             var getNearestMyWaypoint = GetNearestWayPointForPoint(myPosition);
 
             var pathNextPoint = (Point2D) null;
 
             if (nearestTargetPoint == getNearestMyWaypoint)
             {
-                //pathNextPoint = nearestTargetPoint.Position;
                 pathNextPoint = new Point2D(moveToParams.TargetPoint.X, moveToParams.TargetPoint.Y);
             }
             else
@@ -34,6 +30,25 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var angleWaypoints = AngleBetweenPoints(path[1].Position, path[0].Position,
                     new Point2D(Tick.Self.X, Tick.Self.Y));
                 pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI / 2 ? path[1].Position : path[0].Position;
+            }
+
+            var microPath = PathFindingHelper.GetPath(Tick.Self.GetPositionPoint(), pathNextPoint);
+            if (microPath != null && microPath.Count > 0)
+            {
+                var firstMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[0], PathFindingHelper.gridStep);
+                //Если достигли точки микропути, попробуем пойти к следующей или  если её нет пропустим её
+                if (myPosition.GetDistanceTo(firstMicroPathPoint) < Tick.Self.Radius)
+                {
+                    if (microPath.Count > 1)
+                    {
+                        var secondMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[1], PathFindingHelper.gridStep);
+                        pathNextPoint = secondMicroPathPoint;
+                    } 
+                }
+                else
+                {
+                    pathNextPoint = firstMicroPathPoint;
+                }
             }
 
             var angleToTargetPoint = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
@@ -51,7 +66,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var faceForward = Math.Abs(angleToTargetPoint) <= Math.PI/2;
                 var angle1 = Tick.Self.GetAngleTo(firstUnit);
 
-                var escapeAngle = angle1 <= 0 ? angle1 + Math.PI / 2 : angle1 - Math.PI / 2;
                 var escapeSpeed = faceForward ? Tick.Game.WizardForwardSpeed: - Tick.Game.WizardBackwardSpeed; ;
                 var escapeStrafe = angle1 <= 0 ? Tick.Game.WizardStrafeSpeed : -Tick.Game.WizardStrafeSpeed;
 

@@ -17,12 +17,42 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         {
             if (!IsWaypointsBuilt)
             {
-                BuildWaypoints();
+                var myLaneType = GameState.MyLaneType ?? GetDefaultLineType();
+                BuildWaypoints(myLaneType);
             }
             return AllWaypoints;
         }
 
-        public static void BuildWaypoints()
+        private static LaneType GetDefaultLineType()
+        {
+            var lane = LaneType.Middle;
+
+            switch ((int)Tick.Self.Id)
+            {
+                case 1:
+                case 2:
+                case 6:
+                case 7:
+                    lane = LaneType.Top;
+                    break;
+                case 3:
+                case 8:
+                    lane = LaneType.Middle;
+                    break;
+                case 4:
+                case 5:
+                case 9:
+                case 10:
+                    lane = LaneType.Bottom;
+                    break;
+                default:
+                    break;
+            }
+
+            return lane;
+        }
+
+        public static void BuildWaypoints(LaneType laneType)
         {
             IsWaypointsBuilt = true;
 
@@ -30,7 +60,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             //var waypointCoordinates = TestAllMidWaypoints();
             //var waypointCoordinates = TestAllTopWaypoints();
             //var waypointCoordinates = TestCenterTop();
-            var waypointCoordinates = GetDefaultWaypoints();
+            var waypointCoordinates = GetWaypoints(laneType);
 
             var waypoints = BuildLinkedWaypoints(waypointCoordinates);
             AllWaypoints.AddRange(waypoints);
@@ -97,37 +127,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 };
         }
 
-        private static List<Point2D> GetDefaultWaypoints()
+        private static List<Point2D> GetWaypoints(LaneType laneType)
         {
             var mapSize = Tick.Game.MapSize;
 
-            var lane = LaneType.Top;
-
-            switch ((int)Tick.Self.Id)
-            {
-                case 1:
-                case 2:
-                case 6:
-                case 7:
-                    lane = LaneType.Top;
-                    break;
-                case 3:
-                case 8:
-                    lane = LaneType.Middle;
-                    break;
-                case 4:
-                case 5:
-                case 9:
-                case 10:
-                    lane = LaneType.Bottom;
-                    break;
-                default:
-                    break;
-            }
-
             var waypointCoordinates = new List<Point2D>();
 
-            if (lane == LaneType.Top)
+            if (laneType == LaneType.Top)
             {
                 waypointCoordinates.AddRange(new[]
                 {
@@ -144,7 +150,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     new Point2D(mapSize - 200.0D, 200.0D)
                 });
             }
-            else if (lane == LaneType.Middle)
+            else if (laneType == LaneType.Middle)
             {
                 waypointCoordinates.AddRange(new[]
                 {
@@ -152,10 +158,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     /*random.nextBoolean() ? new Point2D(600.0D, mapSize - 200.0D) : */
                     new Point2D(200.0D, mapSize - 600.0D),
                     new Point2D(800.0D, mapSize - 800.0D),
+                    new Point2D(1400.0D, mapSize - 1400.0D),
+                    new Point2D(2000.0D, mapSize - 2000.0D),
+                    new Point2D(2600.0D, mapSize - 2600.0D),
+                    new Point2D(3200.0D, mapSize - 3200.0D),
                     new Point2D(mapSize - 600.0D, 600.0D)
                 });
             }
-            else if (lane == LaneType.Bottom)
+            else if (laneType == LaneType.Bottom)
             {
                 waypointCoordinates.AddRange(new[]
                 {

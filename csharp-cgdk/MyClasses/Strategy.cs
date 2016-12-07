@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.Model;
 using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Basic;
 using Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers;
+using EpPathFinding.cs;
 
 namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
 {
@@ -25,6 +26,37 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
         {
             Tick.Move.SkillToLearn = SkillsHelper.GetSkillToLearn();
 
+            if (Tick.Self.IsMaster)
+            {
+                var messages = new[]
+                {
+                    new Message(LaneType.Top, null, new byte[0]),
+                    new Message(LaneType.Middle, null, new byte[0]),
+                    new Message(LaneType.Middle, null, new byte[0]),
+                    new Message(LaneType.Bottom, null, new byte[0]),
+                };
+                Tick.Move.Messages = messages;
+                GameState.MyLaneType = LaneType.Middle;
+            }
+            else
+            {
+                //Первые 10 тиков ждем команду мастера, определяемся с лайном
+                if (Tick.Game.TickCount < 10)
+                {
+                    if (Tick.Self.Messages != null && Tick.Self.Messages.Length > 0)
+                    {
+                        var message = Tick.Self.Messages.Last();
+                        GameState.MyLaneType = message.Lane;
+                    }
+                    return;
+                }
+
+                if (GameState.MyLaneType == null)
+                {
+                    GameState.MyLaneType = LaneType.Middle;
+                }
+            }
+
             //DebugTrace.ExecuteVisualizer(() =>
             //{
             //    DebugTrace.ConsoleWriteLite($"XP {Tick.Self.Xp} Level {Tick.Self.Level} Skills {string.Join(", ", Tick.Self.Skills)}");
@@ -38,7 +70,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             //    DebugTrace.ConsoleWriteLite(
             //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
             //});
-
+            
             var evideableProjectiles = ProjectilesHelper.GetEvideableProjectiles();
             if (evideableProjectiles.Any())
             {

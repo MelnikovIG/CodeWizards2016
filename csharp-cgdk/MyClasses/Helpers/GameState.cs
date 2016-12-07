@@ -18,6 +18,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         //Информация о начале и конце выстрела
         public static Dictionary<long, ProjectilesInfo> ProjectilesInfo { get; set; } = new Dictionary<long, ProjectilesInfo>();
+
+        public static LaneType? MyLaneType { get; set; }
     }
 
     public class ProjectilesInfo

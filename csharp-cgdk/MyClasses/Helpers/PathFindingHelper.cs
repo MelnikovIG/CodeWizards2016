@@ -34,13 +34,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static List<GridPos> GetPath(Point2D start, Point2D end)
         {
-            Array.Clear(MovableMatrix, 0, MovableMatrix.Length);
-            for (int widthTrav = 0; widthTrav < gridSize; widthTrav++)
+            for (int i = 0; i < MovableMatrix.Length; i++)
             {
-                MovableMatrix[widthTrav] = new bool[gridSize];
-                for (int heightTrav = 0; heightTrav < gridSize; heightTrav++)
+                var row = MovableMatrix[i];
+                for (int index = 0; index < row.Length; index++)
                 {
-                    MovableMatrix[widthTrav][heightTrav] = true;
+                    MovableMatrix[i][index] = true;
                 }
             }
 

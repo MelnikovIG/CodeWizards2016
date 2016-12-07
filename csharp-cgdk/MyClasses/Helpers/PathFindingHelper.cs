@@ -68,15 +68,16 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
                 //TODO: проверить на границы
                 //Клетка цели занята, поищем рядом в радиусе 3х клеток свободные
-                for (int i = -testRange; i < testRange; i++)
+                for (int i = -testRange; i <= testRange; i++)
                 {
-                    for (int j = -testRange; j < testRange; j++)
+                    for (int j = -testRange; j <= testRange; j++)
                     {
                         var isWalkable = searchGrid.IsWalkableAt(new GridPos(endGridPos.x + i, endGridPos.y + j));
                         if (isWalkable)
                         {
+                            i = testRange+1;
+                            j = testRange+1;
                             nearResult = new GridPos(endGridPos.x + i, endGridPos.y + j);
-                            break;
                         }
                     }
                 }

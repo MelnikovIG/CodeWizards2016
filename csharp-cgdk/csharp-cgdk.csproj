@@ -123,7 +123,6 @@
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />
     <Compile Include="MyClasses\Helpers\VisualClientHelper.cs" />
     <Compile Include="MyClasses\Helpers\WayPointsHelper.cs" />
-    <Compile Include="MyClasses\MapGrid\MapGrid.cs" />
     <Compile Include="MyClasses\Strategy.cs" />
     <Compile Include="MyClasses\VisualClient.cs" />
     <Compile Include="MyStrategy.cs" />

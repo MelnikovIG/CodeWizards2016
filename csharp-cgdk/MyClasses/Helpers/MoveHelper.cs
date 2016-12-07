@@ -32,24 +32,24 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 pathNextPoint = Math.Abs(angleWaypoints) <= Math.PI / 2 ? path[1].Position : path[0].Position;
             }
 
-            //var microPath = PathFindingHelper.GetPath(Tick.Self.GetPositionPoint(), pathNextPoint);
-            //if (microPath != null && microPath.Count > 0)
-            //{
-            //    var firstMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[0], PathFindingHelper.gridStep);
-            //    //Если достигли точки микропути, попробуем пойти к следующей или  если её нет пропустим её
-            //    if (myPosition.GetDistanceTo(firstMicroPathPoint) < Tick.Self.Radius)
-            //    {
-            //        if (microPath.Count > 1)
-            //        {
-            //            var secondMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[1], PathFindingHelper.gridStep);
-            //            pathNextPoint = secondMicroPathPoint;
-            //        } 
-            //    }
-            //    else
-            //    {
-            //        pathNextPoint = firstMicroPathPoint;
-            //    }
-            //}
+            var microPath = PathFindingHelper.GetPath(Tick.Self.GetPositionPoint(), pathNextPoint);
+            if (microPath != null && microPath.Count > 0)
+            {
+                var firstMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[0], PathFindingHelper.gridStep);
+                //Если достигли точки микропути, попробуем пойти к следующей или  если её нет пропустим её
+                if (myPosition.GetDistanceTo(firstMicroPathPoint) < Tick.Self.Radius)
+                {
+                    if (microPath.Count > 1)
+                    {
+                        var secondMicroPathPoint = PathFindingHelper.GetCellCenterPoint(microPath[1], PathFindingHelper.gridStep);
+                        pathNextPoint = secondMicroPathPoint;
+                    }
+                }
+                else
+                {
+                    pathNextPoint = firstMicroPathPoint;
+                }
+            }
 
             var angleToTargetPoint = Tick.Self.GetAngleTo(pathNextPoint.X, pathNextPoint.Y);
 

@@ -11,7 +11,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
     public static class PathFindingHelper
     {
-        public static int gridStep = (int)20;
+        public static int gridStep = (int)40;
         public static int gridSize = (int)Tick.Game.MapSize / gridStep;
 
         private static bool[][] _movableMatrix;
@@ -133,14 +133,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static void DrawPath(List<GridPos> path, int step)
         {
-            //path.ForEach(
-            //    x =>
-            //    {
-            //        var p1 = x.x;
-            //        var p2 = x.y;
-            //        VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step), new VisualClientColor(0,1,1) );
-            //    }
-            //    );
+            path.ForEach(
+                x =>
+                {
+                    var p1 = x.x;
+                    var p2 = x.y;
+                    VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step), new VisualClientColor(0, 1, 1));
+                }
+                );
         }
 
         //public static void DrawWaypoints()

@@ -165,7 +165,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 else
                 {
                     var nearestEnemyMinions =
-                        UnitHelper.GetNearestMinions(castRange, false).Where(isAngleAllowedToAttack).ToList();
+                        UnitHelper.GetNearestMinions(castRange, false)
+                            .RemoveNonAgressiveNeutrals()
+                            .Where(isAngleAllowedToAttack)
+                            .ToList();
                     ;
                     if (nearestEnemyMinions.Count > 0)
                     {
@@ -245,7 +248,9 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
                 else
                 {
-                    var nearestEnemyMinions = UnitHelper.GetNearestMinions(range, false, GetObjectRangeMode.CenterToTargetBorder);
+                    var nearestEnemyMinions =
+                        UnitHelper.GetNearestMinions(range, false, GetObjectRangeMode.CenterToTargetBorder)
+                            .RemoveNonAgressiveNeutrals();
                     if (nearestEnemyMinions.Count > 0)
                     {
                         targetToAtack = nearestEnemyMinions.OrderBy(x => x.Life).FirstOrDefault();
@@ -383,8 +388,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     else if (minion.Faction == Faction.Neutral || minion.Faction == Faction.Other)
                     {
 
-                        var isAgressive = minion.SpeedX > 0 || minion.SpeedY > 0 || minion.Life < minion.MaxLife ||
-                                          minion.RemainingActionCooldownTicks > 0;
+                        var isAgressive = UnitHelper.IsNeutralMinionAgressive(minion);
 
                         if (isAgressive)
                         {

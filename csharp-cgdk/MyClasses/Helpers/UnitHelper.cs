@@ -66,6 +66,18 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     .Where(x => GetDistance(x, range, rangeMode))
                     .ToList();
         }
+
+        public static bool IsNeutralMinionAgressive(Minion minion)
+        {
+            var isAgressive = minion.SpeedX > 0 || minion.SpeedY > 0 || minion.Life < minion.MaxLife ||
+                  minion.RemainingActionCooldownTicks > 0;
+            return isAgressive;
+        }
+
+        public static List<Minion> RemoveNonAgressiveNeutrals(this List<Minion> minions)
+        {
+            return minions.Where(x => x.Faction != Faction.Neutral || IsNeutralMinionAgressive(x)).ToList();
+        } 
     }
 
     public enum GetObjectRangeMode

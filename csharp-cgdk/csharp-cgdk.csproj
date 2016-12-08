@@ -100,7 +100,6 @@
     <Compile Include="Model\World.cs" />
     <Compile Include="IStrategy.cs" />
     <Compile Include="MyClasses\Basic\Point2D.cs" />
-    <Compile Include="MyClasses\Basic\PushPower.cs" />
     <Compile Include="MyClasses\Basic\Vector.cs" />
     <Compile Include="MyClasses\EpPathFinding\GridPos.cs" />
     <Compile Include="MyClasses\EpPathFinding\GridRect.cs" />

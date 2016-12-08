@@ -64,13 +64,9 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
 
             var pushPower = GetPushPower();
 
-            //DebugTrace.ExecuteVisualizer(() =>
-            //{
-            //    var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
-            //    DebugTrace.ConsoleWriteLite(
-            //        $"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
-            //});
-            
+            //var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
+            //DebugHelper.ConsoleWriteLite($"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
+
             var evideableProjectiles = ProjectilesHelper.GetEvideableProjectiles();
             if (evideableProjectiles.Any())
             {
@@ -101,8 +97,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {
-                            //TargetPoint = new Point2D(target.X, target.Y),
-                            TargetPoint = new Point2D(0, Tick.Game.MapSize - PathFindingHelper.gridStep),
+                            TargetPoint = new Point2D(target.X, target.Y),
+                            //TargetPoint = new Point2D(Tick.Game.MapSize - PathFindingHelper.gridStep, 0),
                             LookAtPoint = new Point2D(target.X, target.Y),
                         });
                     }
@@ -503,5 +499,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
 
             return pushPower;
         }
+    }
+
+    public class PushPower
+    {
+        public double FrienlyPower { get; set; }
+        public double EnemyPower { get; set; }
     }
 }

@@ -98,7 +98,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             //    {
             //        var p1 = x.x;
             //        var p2 = x.y;
-            //        VisualClientHelper.Rect(new Point2D(p1*step, p2*step), new Point2D((p1 + 1)*step, (p2 + 1)*step),
+            //        VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step),
             //            new VisualClientColor(0, 1, 1));
             //    }
             //    );

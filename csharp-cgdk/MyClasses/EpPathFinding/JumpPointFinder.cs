@@ -263,8 +263,7 @@ namespace EpPathFinding.cs
                 return null;
             List<GridPos> consecutiveGridList = new List<GridPos>();
             if (routeFound.Count > 1)
-                consecutiveGridList.Add(new GridPos(routeFound[0]));
-                //consecutiveGridList.Add(routeFound[0]);
+                consecutiveGridList.Add(routeFound[0]);
             for (int routeTrav = 0; routeTrav < routeFound.Count - 1; routeTrav++)
             {
                 GridPos fromGrid = routeFound[routeTrav];

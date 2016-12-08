@@ -67,23 +67,23 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             var result = JumpPointFinder.FindPath(jpParam);
             //result = JumpPointFinder.GetFullPath(result);
 
-            var clmnIdx = 0;
-            foreach (var row in MovableMatrix)
-            {
-                var rowIdx = 0;
-                foreach (var b in row)
-                {
-                    if (!b)
-                    {
-                        VisualClientHelper.Rect(new Point2D(clmnIdx * gridStep, rowIdx * gridStep),
-                            new Point2D((clmnIdx + 1) * gridStep, (rowIdx + 1) * gridStep), new VisualClientColor(0, 0, 1));
-                    }
+            //var clmnIdx = 0;
+            //foreach (var row in MovableMatrix)
+            //{
+            //    var rowIdx = 0;
+            //    foreach (var b in row)
+            //    {
+            //        if (!b)
+            //        {
+            //            VisualClientHelper.Rect(new Point2D(clmnIdx * gridStep, rowIdx * gridStep),
+            //                new Point2D((clmnIdx + 1) * gridStep, (rowIdx + 1) * gridStep), new VisualClientColor(0, 0, 1));
+            //        }
 
-                    rowIdx++;
-                }
+            //        rowIdx++;
+            //    }
 
-                clmnIdx++;
-            }
+            //    clmnIdx++;
+            //}
 
             DrawPath(result, gridStep);
 
@@ -102,14 +102,14 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static void DrawPath(List<GridPos> path, int step)
         {
-            path.ForEach(
-                x =>
-                {
-                    var p1 = x.x;
-                    var p2 = x.y;
-                    VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step), new VisualClientColor(0, 1, 1));
-                }
-                );
+            //path.ForEach(
+            //    x =>
+            //    {
+            //        var p1 = x.x;
+            //        var p2 = x.y;
+            //        VisualClientHelper.Rect(new Point2D(p1 * step, p2 * step), new Point2D((p1 + 1) * step, (p2 + 1) * step), new VisualClientColor(0, 1, 1));
+            //    }
+            //    );
         }
 
         //public static void DrawWaypoints()

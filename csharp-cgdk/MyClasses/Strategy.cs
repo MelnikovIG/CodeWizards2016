@@ -77,6 +77,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 //TODO: evide frostbolt first?
                 var firstEvideableProjectile = evideableProjectiles.First();
                 var evideVector = firstEvideableProjectile.EvadeVector;
+                evideVector.Normalize();
+                evideVector = 5* evideVector;
 
                 var evdePoint = new Point2D(Tick.Self.X, Tick.Self.Y) + evideVector;
                 var moveToParams = new MoveToParams()
@@ -99,14 +101,15 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {
-                            TargetPoint = new Point2D(target.X, target.Y),
+                            //TargetPoint = new Point2D(target.X, target.Y),
+                            TargetPoint = new Point2D(0, Tick.Game.MapSize - PathFindingHelper.gridStep),
                             LookAtPoint = new Point2D(target.X, target.Y),
                         });
                     }
                 }
                 else
                 {
-                    var enemyBasePoint = new Point2D(Tick.Game.MapSize, 0);
+                    var enemyBasePoint = new Point2D(Tick.Game.MapSize - PathFindingHelper.gridStep, 0);
                     var moveToParams = new MoveToParams()
                     {
                         TargetPoint = enemyBasePoint,
@@ -123,7 +126,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
 
                 var moveToParams = new MoveToParams()
                 {
-                    TargetPoint = new Point2D(0, Tick.Game.MapSize),
+                    TargetPoint = new Point2D(0, Tick.Game.MapSize - PathFindingHelper.gridStep),
                     LookAtPoint = viewTarget != null ? new Point2D(viewTarget.X, viewTarget.Y) : null
                 };
                 MoveHelper.MoveTo(moveToParams);

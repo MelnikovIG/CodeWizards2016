@@ -11,7 +11,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
     public static class PathFindingHelper
     {
-        public static int gridStep = (int)40;
+        public static int gridStep = (int)20;
         public static int gridSize = (int)Tick.Game.MapSize / gridStep;
 
         private static bool[][] _movableMatrix;
@@ -52,68 +52,38 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             {
                 var p1 = (int)nearestMinion.X / gridStep;
                 var p2 = (int)nearestMinion.Y / gridStep;
-                DrawFilledCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius) / gridStep, gridSize, MovableMatrix);
+                FillMovableCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius) / gridStep, gridSize, MovableMatrix, false);
             }
-
-            BaseGrid searchGrid = new StaticGrid(gridSize, gridSize, MovableMatrix);
 
             var startGridPos = GetGridPosByPoint2d(start, gridStep);
             var endGridPos = GetGridPosByPoint2d(end, gridStep);
-            if (!searchGrid.IsWalkableAt(endGridPos))
-            {
-                var nearResult = (GridPos)null;
 
-                var testRange = 7;
+            MovableMatrix[startGridPos.x][startGridPos.y] = true;
+            FillMovableCircle(endGridPos.x, endGridPos.y, (int)(Tick.Self.Radius * 2) / gridStep, gridSize, MovableMatrix, true);
 
-                //TODO: проверить на границы
-                //Клетка цели занята, поищем рядом в радиусе 3х клеток свободные
-                for (int i = -testRange; i <= testRange; i++)
-                {
-                    for (int j = -testRange; j <= testRange; j++)
-                    {
-                        var isWalkable = searchGrid.IsWalkableAt(new GridPos(endGridPos.x + i, endGridPos.y + j));
-                        if (isWalkable)
-                        {
-                            i = testRange+1;
-                            j = testRange+1;
-                            nearResult = new GridPos(endGridPos.x + i, endGridPos.y + j);
-                        }
-                    }
-                }
-
-
-                if (nearResult == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    endGridPos = nearResult;
-                }
-            }
-
+            BaseGrid searchGrid = new StaticGrid(gridSize, gridSize, MovableMatrix);
 
             JumpPointParam jpParam = new JumpPointParam(searchGrid, startGridPos, endGridPos);
             var result = JumpPointFinder.FindPath(jpParam);
-            result = JumpPointFinder.GetFullPath(result);
+            //result = JumpPointFinder.GetFullPath(result);
 
-            //var clmnIdx = 0;
-            //foreach (var row in movableMatrix)
-            //{
-            //    var rowIdx = 0;
-            //    foreach (var b in row)
-            //    {
-            //        if (!b)
-            //        {
-            //            VisualClientHelper.Rect(new Point2D(clmnIdx * gridStep, rowIdx * gridStep),
-            //                new Point2D((clmnIdx + 1) * gridStep, (rowIdx + 1) * gridStep), new VisualClientColor(0, 0, 1));
-            //        }
+            var clmnIdx = 0;
+            foreach (var row in MovableMatrix)
+            {
+                var rowIdx = 0;
+                foreach (var b in row)
+                {
+                    if (!b)
+                    {
+                        VisualClientHelper.Rect(new Point2D(clmnIdx * gridStep, rowIdx * gridStep),
+                            new Point2D((clmnIdx + 1) * gridStep, (rowIdx + 1) * gridStep), new VisualClientColor(0, 0, 1));
+                    }
 
-            //        rowIdx++;
-            //    }
+                    rowIdx++;
+                }
 
-            //    clmnIdx++;
-            //}
+                clmnIdx++;
+            }
 
             DrawPath(result, gridStep);
 
@@ -179,7 +149,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         //    }
         //}
 
-        private static void DrawFilledCircle(int x0, int y0, int radius, int size, bool[][] movableMatrix)
+        private static void FillMovableCircle(int x0, int y0, int radius, int size, bool[][] movableMatrix, bool moveable)
         {
             int x = radius;
             int y = 0;
@@ -191,13 +161,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             {
                 for (int i = x0 - x; i <= x0 + x; i++)
                 {
-                    SetCell(i, y0 + y, size, movableMatrix);
-                    SetCell(i, y0 - y, size, movableMatrix);
+                    SetCell(i, y0 + y, size, movableMatrix, moveable);
+                    SetCell(i, y0 - y, size, movableMatrix, moveable);
                 }
                 for (int i = x0 - y; i <= x0 + y; i++)
                 {
-                    SetCell(i, y0 + x, size, movableMatrix);
-                    SetCell(i, y0 - x, size, movableMatrix);
+                    SetCell(i, y0 + x, size, movableMatrix, moveable);
+                    SetCell(i, y0 - x, size, movableMatrix, moveable);
                 }
 
                 y++;
@@ -212,12 +182,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             }
         }
 
-        private static void SetCell(int x, int y, int size, bool[][] movableMatrix)
+        private static void SetCell(int x, int y, int size, bool[][] movableMatrix, bool moveable)
         {
             if (x < 0 || y < 0 || x > size - 1 || y > size - 1)
                 return;
 
-            movableMatrix[x][y] = false;
+            movableMatrix[x][y] = moveable;
         }
     }
 }

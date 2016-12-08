@@ -114,6 +114,7 @@
     <Compile Include="MyClasses\EpPathFinding\NodePool.cs" />
     <Compile Include="MyClasses\Helpers\Extensions.cs" />
     <Compile Include="MyClasses\Helpers\GameState.cs" />
+    <Compile Include="MyClasses\Helpers\GlobalMapHelper.cs" />
     <Compile Include="MyClasses\Helpers\MoveHelper.cs" />
     <Compile Include="MyClasses\Helpers\PathFindingHelper.cs" />
     <Compile Include="MyClasses\Helpers\ProjectilesHelper.cs" />
@@ -122,7 +123,6 @@
     <Compile Include="MyClasses\Helpers\DebugHelper.cs" />
     <Compile Include="MyClasses\Helpers\UnitHelper.cs" />
     <Compile Include="MyClasses\Helpers\VisualClientHelper.cs" />
-    <Compile Include="MyClasses\Helpers\WayPointsHelper.cs" />
     <Compile Include="MyClasses\Strategy.cs" />
     <Compile Include="MyClasses\VisualClient.cs" />
     <Compile Include="MyStrategy.cs" />

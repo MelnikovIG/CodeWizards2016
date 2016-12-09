@@ -10,17 +10,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
     public static class SkillsHelper
     {
         private static readonly SkillType[] skills = {
-            SkillType.RangeBonusPassive1,
-            SkillType.RangeBonusAura1,
-            SkillType.RangeBonusPassive2,
-            SkillType.RangeBonusAura2,
-            SkillType.AdvancedMagicMissile,
-
             SkillType.MagicalDamageBonusPassive1,
             SkillType.MagicalDamageBonusAura1,
             SkillType.MagicalDamageBonusPassive2,
             SkillType.MagicalDamageBonusAura2,
             SkillType.FrostBolt,
+
+            SkillType.RangeBonusPassive1,
+            SkillType.RangeBonusAura1,
+            SkillType.RangeBonusPassive2,
+            SkillType.RangeBonusAura2,
+            SkillType.AdvancedMagicMissile,
 
             SkillType.StaffDamageBonusPassive1,
             SkillType.StaffDamageBonusAura1,

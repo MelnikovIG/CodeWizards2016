@@ -86,9 +86,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 return;
             }
 
+
+            var target = GetOptimalTargetToAtack(Tick.Self.CastRange);
+
             if (pushPower.FrienlyPower >= pushPower.EnemyPower)
             {
-                var target = GetOptimalTargetToAtack(Tick.Self.CastRange);
                 if (target != null)
                 {
                     AtackTarget(target);
@@ -116,108 +118,18 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             }
             else
             {
-                AttackAnyTargetOnBackward();
-
-                var viewTarget = GetOptimalTargetToAtack(Tick.Self.CastRange * 1.5);
+                if (target == null)
+                {
+                    //Некого атаковать, но будем смотреть на ближайшего врага
+                    target = GetOptimalTargetToAtack(Tick.Self.CastRange*1.5);
+                }
 
                 var moveToParams = new MoveToParams()
                 {
                     TargetPoint = new Point2D(0, Tick.Game.MapSize - PathFindingHelper.gridStep),
-                    LookAtPoint = viewTarget != null ? new Point2D(viewTarget.X, viewTarget.Y) : null
+                    LookAtPoint = target != null ? new Point2D(target.X, target.Y) : null
                 };
                 MoveHelper.MoveTo(moveToParams);
-            }
-        }
-
-        //Атаковать любую цель при отступлении, которая попадает в рендж
-        private static void AttackAnyTargetOnBackward()
-        {
-            var castRange = Tick.Self.CastRange;
-
-            LivingUnit targetToAtack = null;
-
-            //При отступлении не повораиваемся ради атаки, а ищем цели которые подходят по текущий угол
-            Func<LivingUnit, bool> isAngleAllowedToAttack = unit =>
-            {
-                var angle = Tick.Self.GetAngleTo(unit);
-                return Math.Abs(angle) < Tick.Game.StaffSector/2.0D;
-            };
-
-            var nearestEnemyWizards =
-                UnitHelper.GetNearestWizards(castRange, false, GetObjectRangeMode.CenterToTargetBorder).Where(isAngleAllowedToAttack).ToList();
-            if (nearestEnemyWizards.Count > 0)
-            {
-                targetToAtack = nearestEnemyWizards.OrderBy(x => x.Life).FirstOrDefault();
-            }
-            else
-            {
-                var nearestEnemyBuidings =
-                    UnitHelper.GetNearestBuidigs(castRange, false).Where(isAngleAllowedToAttack).ToList();
-                
-                if (nearestEnemyBuidings.Count > 0)
-                {
-                    targetToAtack = nearestEnemyBuidings.OrderBy(x => x.Life).FirstOrDefault();
-                }
-                else
-                {
-                    var nearestEnemyMinions =
-                        UnitHelper.GetNearestMinions(castRange, false)
-                            .RemoveNonAgressiveNeutrals()
-                            .Where(isAngleAllowedToAttack)
-                            .ToList();
-                    ;
-                    if (nearestEnemyMinions.Count > 0)
-                    {
-                        targetToAtack = nearestEnemyMinions.OrderBy(x => x.Life).FirstOrDefault();
-                    }
-                }
-            }
-
-            if (targetToAtack == null)
-            {
-                return;
-            }
-            else
-            {
-                double distance = Tick.Self.GetDistanceTo(targetToAtack);
-                double angle = Tick.Self.GetAngleTo(targetToAtack);
-                if (distance - targetToAtack.Radius <= Tick.Game.StaffRange)
-                {
-                    // ... то атакуем с руки.
-                    Tick.Move.Action = ActionType.Staff;
-                    Tick.Move.CastAngle = angle;
-                    Tick.Move.MinCastDistance = distance - targetToAtack.Radius + Tick.Game.MagicMissileRadius;
-                }
-                else
-                {
-                    if (targetToAtack is Wizard)
-                    {
-                        var canCastFrostbolt = Tick.Self.Skills.Any(x => x == SkillType.FrostBolt) &&
-                                               Tick.Self.RemainingActionCooldownTicks == 0 &&
-                                               Tick.Self.RemainingCooldownTicksByAction[(int)ActionType.FrostBolt] == 0;
-                        var canCastFireball = Tick.Self.Skills.Any(x => x == SkillType.Fireball) &&
-                                              Tick.Self.RemainingActionCooldownTicks == 0 &&
-                                              Tick.Self.RemainingCooldownTicksByAction[(int)ActionType.Fireball] == 0;
-                        if (canCastFrostbolt)
-                        {
-                            Tick.Move.Action = ActionType.FrostBolt;
-                        }
-                        else if (canCastFireball)
-                        {
-                            Tick.Move.Action = ActionType.Fireball;
-                        }
-                        else
-                        {
-                            Tick.Move.Action = ActionType.MagicMissile;
-                        }
-                    }
-                    else
-                    {
-                        Tick.Move.Action = ActionType.MagicMissile;
-                    }
-                    Tick.Move.CastAngle = angle;
-                    Tick.Move.MinCastDistance = distance - targetToAtack.Radius + Tick.Game.MagicMissileRadius;
-                }
             }
         }
 

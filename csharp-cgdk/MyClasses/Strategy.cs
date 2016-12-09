@@ -123,6 +123,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     //Некого атаковать, но будем смотреть на ближайшего врага
                     target = GetOptimalTargetToAtack(Tick.Self.CastRange*1.5);
                 }
+                else
+                {
+                    AtackTarget(target);
+                }
 
                 var moveToParams = new MoveToParams()
                 {

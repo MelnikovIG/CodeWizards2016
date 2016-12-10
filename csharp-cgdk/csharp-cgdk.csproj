@@ -117,6 +117,7 @@
     <Compile Include="MyClasses\Helpers\MoveHelper.cs" />
     <Compile Include="MyClasses\Helpers\PathFindingHelper.cs" />
     <Compile Include="MyClasses\Helpers\ProjectilesHelper.cs" />
+    <Compile Include="MyClasses\Helpers\PushPowerHelper.cs" />
     <Compile Include="MyClasses\Helpers\Skills.cs" />
     <Compile Include="MyClasses\Helpers\TickHelper.cs" />
     <Compile Include="MyClasses\Helpers\DebugHelper.cs" />

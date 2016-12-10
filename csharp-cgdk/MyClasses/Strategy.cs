@@ -62,7 +62,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             //    DebugTrace.ConsoleWriteLite($"XP {Tick.Self.Xp} Level {Tick.Self.Level} Skills {string.Join(", ", Tick.Self.Skills)}");
             //});
 
-            var pushPower = GetPushPower();
+            var pushPower = PushPowerHelper.GetPushPower();
 
             //var arrow = pushPower.FrienlyPower >= pushPower.EnemyPower ? "-->" : "<--";
             //DebugHelper.ConsoleWriteLite($"{pushPower.FrienlyPower.ToString("N3")} / {pushPower.EnemyPower.ToString("N3")} {arrow}");
@@ -74,7 +74,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 var firstEvideableProjectile = evideableProjectiles.First();
                 var evideVector = firstEvideableProjectile.EvadeVector;
                 evideVector.Normalize();
-                evideVector = 5* evideVector;
+                evideVector = 5*evideVector;
 
                 var evdePoint = new Point2D(Tick.Self.X, Tick.Self.Y) + evideVector;
                 var moveToParams = new MoveToParams()
@@ -95,7 +95,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 {
                     AtackTarget(target);
                     if (target.Faction != Faction.Neutral && target.Faction != Faction.Other &&
-                        Tick.Self.GetDistanceTo(target) > Tick.Self.CastRange * 0.8)
+                        Tick.Self.GetDistanceTo(target) > Tick.Self.CastRange*0.8)
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {
@@ -153,7 +153,8 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             }
             else
             {
-                var nearestEnemyBuidings = UnitHelper.GetNearestBuidigs(range, false, GetObjectRangeMode.CenterToTargetBorder);
+                var nearestEnemyBuidings = UnitHelper.GetNearestBuidigs(range, false,
+                    GetObjectRangeMode.CenterToTargetBorder);
                 if (nearestEnemyBuidings.Count > 0)
                 {
                     targetToAtack = nearestEnemyBuidings.OrderBy(x => x.Life).FirstOrDefault();
@@ -201,13 +202,15 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                         {
                             var canCastFrostbolt = Tick.Self.Skills.Any(x => x == SkillType.FrostBolt) &&
                                                    Tick.Self.RemainingActionCooldownTicks == 0 &&
-                                                   Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.FrostBolt] == 0;
+                                                   Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.FrostBolt] ==
+                                                   0;
                             var canCastFireball = Tick.Self.Skills.Any(x => x == SkillType.Fireball) &&
                                                   Tick.Self.RemainingActionCooldownTicks == 0 &&
-                                                  Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.Fireball] == 0;
+                                                  Tick.Self.RemainingCooldownTicksByAction[(int) ActionType.Fireball] ==
+                                                  0;
                             if (canCastFrostbolt)
                             {
-                                Tick.Move.Action =ActionType.FrostBolt;
+                                Tick.Move.Action = ActionType.FrostBolt;
                             }
                             else if (canCastFireball)
                             {
@@ -228,198 +231,5 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
             }
         }
-
-        private static PushPower GetPushPower()
-        {
-            var wizardBasePower = 1d;
-            var minionBasePower = 0.3;
-            var towerBasePower = 0.4;
-            var baseBasePower = 0.7;
-            var enemyScanRange = Tick.Game.WizardCastRange + 300;
-            var friendRange = Tick.Self.CastRange;
-
-            var myCastRange = Tick.Self.CastRange;
-
-            Func<Wizard, double> getWizardPower =
-                (wizard) =>
-                {
-                    //От создных героев толку мало)
-                    if (wizard.Faction == Tick.Self.Faction && !wizard.IsMe)
-                    {
-                        return wizardBasePower*0.2;
-                    }
-                    else
-                    {
-                        if (wizard.Faction != Tick.Self.Faction)
-                        {
-                            if (Tick.Self.GetDistanceTo(wizard) > wizard.CastRange + Tick.Self.Radius*2)
-                            {
-                                return 0;
-                            }
-                        }
-
-                        var hasEmpower = wizard.Statuses.Any(x => x.Type == StatusType.Empowered);
-                        var hasHaste = wizard.Statuses.Any(x => x.Type == StatusType.Hastened);
-                        var hasShield = wizard.Statuses.Any(x => x.Type == StatusType.Shielded);
-
-                        var result = wizardBasePower
-                                     *(wizard.Life/(double) wizard.MaxLife)
-                                     *
-                                     (0.75 + 0.25*(
-                                         ((Tick.Game.MagicMissileCooldownTicks -
-                                           wizard.RemainingCooldownTicksByAction[2])/
-                                          (double) Tick.Game.MagicMissileCooldownTicks)));
-
-                        if (wizard.CastRange > myCastRange)
-                        {
-                            result *= wizard.CastRange/myCastRange;
-                        }
-
-                        if (hasEmpower)
-                        {
-                            result *= 1.5;
-                        }
-
-                        if (hasHaste)
-                        {
-                            result *= 1.3;
-                        }
-
-                        return result;
-                    }
-                };
-
-            Func<Minion, double> getMinionPower =
-                (minion) =>
-                {
-                    if (minion.Faction == Tick.Self.Faction)
-                    {
-                        //Пока не будем считать союзных крипов как силу
-                        return 0;
-                    }
-                    else if (minion.Faction == Faction.Neutral || minion.Faction == Faction.Other)
-                    {
-
-                        var isAgressive = UnitHelper.IsNeutralMinionAgressive(minion);
-
-                        if (isAgressive)
-                        {
-                            if (minion.Type == MinionType.OrcWoodcutter)
-                            {
-                                if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
-                                {
-                                    return minionBasePower;
-                                }
-                                else
-                                {
-                                    return 0;
-                                }
-                            }
-                            else if (minion.Type == MinionType.FetishBlowdart)
-                            {
-                                if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
-                                {
-                                    return minionBasePower;
-                                }
-                                else
-                                {
-                                    return 0;
-                                }
-                            }
-                            return 0;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-                    else
-                    {
-                        if (minion.Type == MinionType.OrcWoodcutter)
-                        {
-                            if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
-                            {
-                                return minionBasePower;
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
-                        else if (minion.Type == MinionType.FetishBlowdart)
-                        {
-                            if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
-                            {
-                                return minionBasePower;
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
-
-                        return minionBasePower;
-                    }
-                    //return minionBasePower*(minion.Life/(double) minion.MaxLife);
-                };
-
-            Func<Building, double> getBuidingPower =
-                (building) =>
-                {
-                    var basePower = building.Type == BuildingType.FactionBase ? baseBasePower : towerBasePower;
-                    if (building.Faction == Tick.Self.Faction)
-                    {
-                        //Пока не будем считать союзных башен как силу
-                        return 0;
-                    }
-                    else
-                    {
-                        if (building.Type == BuildingType.FactionBase)
-                        {
-                            return basePower*
-                                   ((Tick.Game.FactionBaseCooldownTicks - building.RemainingActionCooldownTicks)/
-                                    (double) Tick.Game.FactionBaseCooldownTicks);
-                        }
-                        else
-                        {
-                            return basePower*
-                                   ((Tick.Game.GuardianTowerCooldownTicks - building.RemainingActionCooldownTicks)/
-                                    (double) Tick.Game.GuardianTowerCooldownTicks);
-                        }
-                    }
-                    //return power*(building.Life/(double) building.MaxLife);
-                };
-
-            var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyScanRange, false).Select(x => getWizardPower(x)).Sum();
-            var enemyMinionsPower = UnitHelper.GetNearestMinions(enemyScanRange, false).Select(x => getMinionPower(x)).Sum();
-            var enemyTowersPower = UnitHelper.GetNearestBuidigs(enemyScanRange, false).Select(x => getBuidingPower(x)).Sum();
-            var enemyPower = enemyWizardsPower + enemyMinionsPower + enemyTowersPower;
-
-
-            //var projectiles = ProjectilesHelper.GetInterselecitionsProjectiles()
-            //    .ToList();
-            //projectiles.ForEach(x => { enemyPower *= 1.1; });
-
-            var friendlyWizardsPower = UnitHelper.GetNearestWizards(friendRange, true).Select(x => getWizardPower(x)).Sum();
-            var friendlyMinionsPower = UnitHelper.GetNearestMinions(friendRange, true).Select(x => getMinionPower(x)).Sum();
-            var friendlyTowersPower = UnitHelper.GetNearestBuidigs(friendRange, true).Select(x => getBuidingPower(x)).Sum();
-            var friendlyPower = friendlyWizardsPower + friendlyMinionsPower + friendlyTowersPower;
-
-            friendlyPower = friendlyPower*(Tick.Self.Life/(double) Tick.Self.MaxLife);
-
-            var pushPower = new PushPower()
-            {
-                FrienlyPower = friendlyPower,
-                EnemyPower = enemyPower
-            };
-
-            return pushPower;
-        }
-    }
-
-    public class PushPower
-    {
-        public double FrienlyPower { get; set; }
-        public double EnemyPower { get; set; }
     }
 }

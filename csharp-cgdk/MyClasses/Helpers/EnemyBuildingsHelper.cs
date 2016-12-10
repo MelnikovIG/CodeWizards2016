@@ -101,13 +101,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                Buildings.First(x => x.EnemyBuildingType == EnemyBuildingType.Top2).DependsOnBuilding = Buildings.First(x => x.EnemyBuildingType == EnemyBuildingType.Top1);
             }
 
-            Buildings.Where(x => !x.IsDead).ToList().ForEach(x =>
-            {
-                var red = (float)(x.CooldownTicks - x.RemainingActionCooldownTicks)/x.CooldownTicks;
+            //Buildings.Where(x => !x.IsDead).ToList().ForEach(x =>
+            //{
+            //    var red = (float)(x.CooldownTicks - x.RemainingActionCooldownTicks)/x.CooldownTicks;
 
-                VisualClientHelper.Circle(x.Position.X,x.Position.Y, (float)x.AttackRange, red, 0, 0);
-                //VisualClientHelper.Circle(x.Position.X,x.Position.Y, (float)x.Radius,0, 0, 1);
-            });
+            //    VisualClientHelper.Circle(x.Position.X,x.Position.Y, (float)x.AttackRange, red, 0, 0);
+            //    //VisualClientHelper.Circle(x.Position.X,x.Position.Y, (float)x.Radius,0, 0, 1);
+            //});
         }
     }
 

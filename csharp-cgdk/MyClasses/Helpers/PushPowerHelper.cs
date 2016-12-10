@@ -9,9 +9,23 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
     public class PushPowerHelper
     {
+        private static double wizardDamagePerTick = (double)Tick.Game.MagicMissileDirectDamage/Tick.Game.MagicMissileCooldownTicks;
+        private static double guardianTowerDamagePerTick = (double) Tick.Game.GuardianTowerDamage/Tick.Game.GuardianTowerCooldownTicks;
+        private static double factionBaseDamagePerTick = (double) Tick.Game.FactionBaseDamage/Tick.Game.FactionBaseCooldownTicks;
+        private static double ordWoodcutterDamagePerTick = (double) Tick.Game.OrcWoodcutterDamage/Tick.Game.OrcWoodcutterActionCooldownTicks;
+        private static double fetishBlowdartDamagePerTick = (double) Tick.Game.DartDirectDamage/Tick.Game.FetishBlowdartActionCooldownTicks;
+
+        private static double baseWizardPower = 1;
+        private static double baseGuardianTowerPower = baseWizardPower * guardianTowerDamagePerTick/ wizardDamagePerTick;
+        private static double baseFactionBasePower = baseWizardPower * factionBaseDamagePerTick / wizardDamagePerTick;
+        private static double ordWoodcutterBasePower = baseWizardPower * ordWoodcutterDamagePerTick / wizardDamagePerTick;
+        private static double fetishBlowdartBasePower = baseWizardPower * fetishBlowdartDamagePerTick / wizardDamagePerTick;
+
         public static PushPower GetPushPower()
         {
-            var enemyScanRange = Tick.Game.WizardCastRange + 300;
+            //Будем скинровать на большом радиусе, на всякий случай,
+            //но при учете опасности все равно будем учитывть расстрояние то меня
+            var enemyScanRange = Tick.Self.CastRange * 1.5;
             var friendRange = Tick.Self.CastRange;
 
             var enemyWizardsPower = UnitHelper.GetNearestWizards(enemyScanRange, false).Select(GetWizardPower).Sum();
@@ -24,7 +38,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             var friendlyTowersPower = UnitHelper.GetNearestBuidigs(friendRange, true).Select(GetBuildingPower).Sum();
             var friendlyPower = friendlyWizardsPower + friendlyMinionsPower + friendlyTowersPower;
 
-            friendlyPower = friendlyPower * (Tick.Self.Life / (double)Tick.Self.MaxLife);
+            friendlyPower = friendlyPower*(Tick.Self.Life/(double) Tick.Self.MaxLife);
 
             var pushPower = new PushPower()
             {
@@ -38,22 +52,25 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         private static double GetWizardPower(Wizard wizard)
         {
             var myCastRange = Tick.Self.CastRange;
-            var wizardBasePower = 1d;
 
             //От создных героев толку мало)
             if (wizard.Faction == Tick.Self.Faction && !wizard.IsMe)
             {
-                if (Tick.Self.GetDistanceTo(wizard) < Tick.Self.Radius * 4)
+                if (Tick.Self.GetDistanceTo(wizard) < Tick.Self.Radius*5)
                 {
-                    return wizardBasePower * 0.3;
+                    return baseWizardPower*0.3;
                 }
                 return 0;
             }
             else
             {
+                //Расстояние, с которого вражеский маг может нанести урон с учетом типа снаряда
+                var wizardCastRange = wizard.CastRange + Tick.Self.Radius + GetAdditionalRangeFromProjectileType(wizard);
+                var ignoreWizardAdditionalBuffer = 10;
+
                 if (wizard.Faction != Tick.Self.Faction)
                 {
-                    if (Tick.Self.GetDistanceTo(wizard) > wizard.CastRange + Tick.Self.Radius * 2)
+                    if (Tick.Self.GetDistanceTo(wizard) > wizardCastRange + ignoreWizardAdditionalBuffer)
                     {
                         return 0;
                     }
@@ -62,28 +79,38 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 var hasEmpower = wizard.Statuses.Any(x => x.Type == StatusType.Empowered);
                 var hasHaste = wizard.Statuses.Any(x => x.Type == StatusType.Hastened);
                 var hasShield = wizard.Statuses.Any(x => x.Type == StatusType.Shielded);
+                var frozen = wizard.Statuses.Any(x => x.Type == StatusType.Frozen);
 
-                var result = wizardBasePower
-                             * (wizard.Life / (double)wizard.MaxLife)
-                             *
-                             (0.75 + 0.25 * (
-                                 ((Tick.Game.MagicMissileCooldownTicks -
-                                   wizard.RemainingCooldownTicksByAction[2]) /
-                                  (double)Tick.Game.MagicMissileCooldownTicks)));
+                var result = baseWizardPower
+                             * (wizard.Life/(double) wizard.MaxLife)
+                             *(0.75 + 0.25*GetWizardMainProjectileCooldownactor(wizard));
 
-                if (wizard.CastRange > myCastRange)
-                {
-                    result *= wizard.CastRange / myCastRange;
-                }
+                //TODO: в случае раскоментирования переписать, работает неверно изза дого что каст врага больше
+                //if (wizard.CastRange > myCastRange)
+                //{
+                //    result *= wizard.CastRange/myCastRange;
+                //}
 
                 if (hasEmpower)
                 {
-                    result *= 1.5;
+                    result *= 1.3;
                 }
 
                 if (hasHaste)
                 {
-                    result *= 1.3;
+                    result *= 1.1;
+                }
+
+                if (frozen)
+                {
+                    var frozenStatus =
+                        wizard.Statuses.Where(x => x.Type == StatusType.Frozen)
+                            .OrderByDescending(x => x.RemainingDurationTicks)
+                            .First();
+                    result *= 0.5 +
+                              0.5*
+                              ((double)(Tick.Game.FrozenDurationTicks - frozenStatus.RemainingDurationTicks)/
+                               Tick.Game.FrozenDurationTicks);
                 }
 
                 return result;
@@ -92,7 +119,6 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         private static double GetMinionPower(Minion minion)
         {
-            var minionBasePower = 0.3;
             if (minion.Faction == Tick.Self.Faction)
             {
                 //Пока не будем считать союзных крипов как силу
@@ -109,7 +135,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     {
                         if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
                         {
-                            return minionBasePower;
+                            return ordWoodcutterBasePower;
                         }
                         else
                         {
@@ -120,7 +146,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     {
                         if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
                         {
-                            return minionBasePower;
+                            return fetishBlowdartBasePower;
                         }
                         else
                         {
@@ -140,7 +166,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 {
                     if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.OrcWoodcutterAttackRange)
                     {
-                        return minionBasePower;
+                        return ordWoodcutterBasePower;
                     }
                     else
                     {
@@ -151,7 +177,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 {
                     if (Tick.Self.GetDistanceTo(minion) - Tick.Self.Radius < Tick.Game.FetishBlowdartAttackRange)
                     {
-                        return minionBasePower;
+                        return fetishBlowdartBasePower;
                     }
                     else
                     {
@@ -159,16 +185,13 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                     }
                 }
 
-                return minionBasePower;
+                return 0;
             }
         }
 
         private static double GetBuildingPower(Building building)
         {
-            var towerBasePower = 0.4;
-            var baseBasePower = 0.7;
-
-            var basePower = building.Type == BuildingType.FactionBase ? baseBasePower : towerBasePower;
+            var basePower = building.Type == BuildingType.FactionBase ? baseFactionBasePower : baseGuardianTowerPower;
             if (building.Faction == Tick.Self.Faction)
             {
                 //Пока не будем считать союзных башен как силу
@@ -176,6 +199,15 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             }
             else
             {
+                //Расстояние, с которого вражесая башня может нанести урон
+                var buildingAttackRange = building.AttackRange;
+                var ignoreBuildingAdditionalBuffer = 10;
+
+                if (Tick.Self.GetDistanceTo(building) > buildingAttackRange + ignoreBuildingAdditionalBuffer)
+                {
+                    return 0;
+                }
+
                 if (building.Type == BuildingType.FactionBase)
                 {
                     return basePower*
@@ -189,6 +221,47 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                             (double) Tick.Game.GuardianTowerCooldownTicks);
                 }
             }
+        }
+
+        //Получить радиус дополнительный в зависимости от  типа снаряда
+        private static double GetAdditionalRangeFromProjectileType(Wizard wizard)
+        {
+            var hasFireball = wizard.Skills.Any(x => x == SkillType.Fireball);
+            var hasFrostBolt = wizard.Skills.Any(x => x == SkillType.FrostBolt);
+
+            if (hasFireball)
+            {
+                return Tick.Game.FireballRadius + Tick.Game.FireballExplosionMaxDamageRange/2;
+            }
+            else if (hasFrostBolt)
+            {
+                return Tick.Game.FrostBoltRadius;
+            }
+            else return Tick.Game.MagicMissileRadius;
+        }
+
+        //Коэффициент ослабление врага при перезарядке
+        private static double GetWizardMainProjectileCooldownactor(Wizard wizard)
+        {
+            var hasFireball = wizard.Skills.Any(x => x == SkillType.Fireball);
+            var hasFrostBolt = wizard.Skills.Any(x => x == SkillType.FrostBolt);
+
+            if (hasFireball)
+            {
+                return (Tick.Game.FireballCooldownTicks -
+                        wizard.RemainingCooldownTicksByAction[(int) ActionType.Fireball])/
+                       (double) Tick.Game.FireballCooldownTicks;
+            }
+            else if (hasFrostBolt)
+            {
+                return (Tick.Game.FrostBoltCooldownTicks -
+                        wizard.RemainingCooldownTicksByAction[(int) ActionType.FrostBolt])/
+                       (double) Tick.Game.FrostBoltCooldownTicks;
+            }
+            else
+                return (Tick.Game.MagicMissileCooldownTicks -
+                        wizard.RemainingCooldownTicksByAction[(int) ActionType.MagicMissile])/
+                       (double) Tick.Game.MagicMissileCooldownTicks;
         }
     }
 

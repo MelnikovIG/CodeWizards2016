@@ -157,7 +157,10 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                     GetObjectRangeMode.CenterToTargetBorder);
                 if (nearestEnemyBuidings.Count > 0)
                 {
-                    targetToAtack = nearestEnemyBuidings.OrderBy(x => x.Life).FirstOrDefault();
+                    targetToAtack =
+                        nearestEnemyBuidings.OrderBy(x => x.Type == BuildingType.FactionBase ? 0 : 1)
+                            .ThenBy(x => x.Life)
+                            .FirstOrDefault();
                 }
                 else
                 {

@@ -40,13 +40,44 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         }
 
         public static List<Building> GetNearestBuidigs(double range, bool friendly,
-            GetObjectRangeMode rangeMode = GetObjectRangeMode.CenterToCenter)
+            GetObjectRangeMode rangeMode = GetObjectRangeMode.CenterToCenter, bool? canAttack = null)
         {
-            return
-                Tick.World.Buildings.Where(
-                    x => friendly ? x.Faction == Tick.Self.Faction : x.Faction != Tick.Self.Faction)
-                    .Where(x => GetDistance(x, range, rangeMode))
-                    .ToList();
+            if (friendly)
+            {
+                return
+                    Tick.World.Buildings.Where(
+                        x => x.Faction == Tick.Self.Faction)
+                        .Where(x => GetDistance(x, range, rangeMode))
+                        .ToList();
+            }
+            else
+            {
+                var nonDeadTowers = EnemyBuildingsHelper.Buildings.Where(x => !x.IsDead);
+                if (canAttack.HasValue)
+                {
+                    nonDeadTowers = nonDeadTowers.Where(x => x.CanBeDamaged == canAttack.Value);
+                }
+
+                return
+                    nonDeadTowers.Select(
+                        x =>
+                        {
+                            long id = -1;
+                            var _x = x.Position.X;
+                            var _y = x.Position.Y;
+                            var speedX = 0;
+                            var speedY = 0;
+                            var angle = 0;
+                            var faction = Tick.Self.Faction == Faction.Academy ? Faction.Renegades : Faction.Academy;
+                            var remainingActionCooldownTicks = x.RemainingActionCooldownTicks;
+
+                            return new Building(id, _x, _y, speedX, speedY, angle, faction, x.Radius, 0,
+                                0, new Status[0], BuildingType.GuardianTower, x.AttackRange, x.AttackRange, 0, 0,
+                                remainingActionCooldownTicks);
+                        })
+                        .Where(x => GetDistance(x, range, rangeMode))
+                        .ToList();
+            }
         }
 
         public static List<Wizard> GetNearestWizards(double range, bool friendly,

@@ -24,6 +24,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
     {
         public static void Execute()
         {
+            EnemyBuildingsHelper.UpdateTowersInfo();;
             Tick.Move.SkillToLearn = SkillsHelper.GetSkillToLearn();
 
             if (Tick.Self.IsMaster)
@@ -154,11 +155,12 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
             else
             {
                 var nearestEnemyBuidings = UnitHelper.GetNearestBuidigs(range, false,
-                    GetObjectRangeMode.CenterToTargetBorder);
+                    GetObjectRangeMode.CenterToTargetBorder, canAttack: true);
                 if (nearestEnemyBuidings.Count > 0)
                 {
                     targetToAtack =
-                        nearestEnemyBuidings.OrderBy(x => x.Type == BuildingType.FactionBase ? 0 : 1)
+                        nearestEnemyBuidings
+                            .OrderBy(x => x.Type == BuildingType.FactionBase ? 0 : 1)
                             .ThenBy(x => x.Life)
                             .FirstOrDefault();
                 }

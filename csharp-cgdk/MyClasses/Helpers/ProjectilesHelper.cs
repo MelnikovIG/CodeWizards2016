@@ -138,7 +138,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 return true;
             }
 
-            var wizardSpeed = 3;
+            var wizardSpeed = 3 * UnitHelper.GetSpeedBonusFactorFromSkillsAndAuras();
 
             var projectilesToInterselectTicks = Math.Abs(/*(int)*/ (interselectPointRange / projectile.Speed));
             var escapeTicks = Math.Abs(/*(int)*/ (distanceToEscape / wizardSpeed));
@@ -163,16 +163,11 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             //VisualClientHelper.Circle(safePoint.X,safePoint.Y, 5, 1,0,0);
 
             var distanceToEscape = Tick.Self.GetDistanceTo(safePoint.X, safePoint.Y);
-            //var distanceToEscape = Tick.Self.Radius + projectile.Radius - interselectMyRange;
-            //if (distanceToEscape < 0)
-            //{
-            //    return true;
-            //}
 
-            var wizardSpeed = 3;
+            var wizardSpeed = 3 * UnitHelper.GetSpeedBonusFactorFromSkillsAndAuras();
 
-            var projectilesToInterselectTicks = Math.Abs( /*(int)*/ (interselectPointRange/projectile.Speed));
-            var escapeTicks = Math.Abs( /*(int)*/ (distanceToEscape/wizardSpeed));
+            var projectilesToInterselectTicks = Math.Abs(interselectPointRange/projectile.Speed);
+            var escapeTicks = Math.Abs(distanceToEscape/wizardSpeed);
             //DebugTrace.ConsoleWriteLite($"{projectilesToInterselectTicks.ToString("N3")} / {escapeTicks.ToString("N3")}");
 
             return escapeTicks <= projectilesToInterselectTicks;

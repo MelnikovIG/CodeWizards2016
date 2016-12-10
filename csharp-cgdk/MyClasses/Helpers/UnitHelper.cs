@@ -108,7 +108,56 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
         public static List<Minion> RemoveNonAgressiveNeutrals(this List<Minion> minions)
         {
             return minions.Where(x => x.Faction != Faction.Neutral || IsNeutralMinionAgressive(x)).ToList();
-        } 
+        }
+
+        public static double GetSpeedBonusFactorFromSkillsAndAuras()
+        {
+            var me = Tick.Self;
+            var hasHaste = me.Statuses.Any(x => x.Type == StatusType.Hastened);
+
+            var nearAllyWizardsWithSpeedAura =
+                Tick.World.Wizards.Where(x => x.Faction == me.Faction)
+                    .Where(x => me.GetDistanceTo(x) <= Tick.Game.AuraSkillRange)
+                    .Where(
+                        x =>
+                            x.Skills.Contains(SkillType.MovementBonusFactorAura2) ||
+                            x.Skills.Contains(SkillType.MovementBonusFactorAura1))
+                    .ToList();
+
+            var allyWizardsMaxBonusFactor = 0;
+            if (nearAllyWizardsWithSpeedAura.Any())
+            {
+                var isSecondLevelAura =
+                    nearAllyWizardsWithSpeedAura.Any(x => x.Skills.Contains(SkillType.MovementBonusFactorAura2));
+                allyWizardsMaxBonusFactor = isSecondLevelAura ? 2 : 1;
+            }
+
+            var myMaxSpeedFactor = 0;
+            if (me.Skills.Any(x => x == SkillType.MovementBonusFactorAura2))
+            {
+                myMaxSpeedFactor = 4;
+            }
+            else if (me.Skills.Any(x => x == SkillType.MovementBonusFactorPassive2))
+            {
+                myMaxSpeedFactor = 3;
+            }
+            if (me.Skills.Any(x => x == SkillType.MovementBonusFactorAura2))
+            {
+                myMaxSpeedFactor = 2;
+            }
+            else if (me.Skills.Any(x => x == SkillType.MovementBonusFactorPassive2))
+            {
+                myMaxSpeedFactor = 1;
+            }
+
+            var maxSkillBonusFactor = myMaxSpeedFactor > allyWizardsMaxBonusFactor
+                ? myMaxSpeedFactor
+                : allyWizardsMaxBonusFactor;
+
+            var totalSpeedFactor = 1 + maxSkillBonusFactor*Tick.Game.MovementBonusFactorPerSkillLevel +
+                                   (hasHaste ? Tick.Game.HastenedRotationBonusFactor : 0);
+            return totalSpeedFactor;
+        }
     }
 
     public enum GetObjectRangeMode

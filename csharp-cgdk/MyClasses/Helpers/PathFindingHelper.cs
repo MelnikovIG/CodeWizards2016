@@ -11,7 +11,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 {
     public static class PathFindingHelper
     {
-        public static int gridStep = (int)20;
+        public static int gridStep = (int)10;
         public static int gridSize = (int)Tick.Game.MapSize / gridStep;
 
         private static bool[][] _movableMatrix;
@@ -52,7 +52,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             {
                 var p1 = (int)nearestMinion.X / gridStep;
                 var p2 = (int)nearestMinion.Y / gridStep;
-                FillMovableCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius * 1.5) / gridStep, gridSize, MovableMatrix, false);
+                FillMovableCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius * 1.1) / gridStep, gridSize, MovableMatrix, false);
             }
 
             var startGridPos = GetGridPosByPoint2d(start, gridStep);

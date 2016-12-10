@@ -155,7 +155,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
                 : allyWizardsMaxBonusFactor;
 
             var totalSpeedFactor = 1 + maxSkillBonusFactor*Tick.Game.MovementBonusFactorPerSkillLevel +
-                                   (hasHaste ? Tick.Game.HastenedRotationBonusFactor : 0);
+                                   (hasHaste ? Tick.Game.HastenedMovementBonusFactor : 0);
             return totalSpeedFactor;
         }
     }

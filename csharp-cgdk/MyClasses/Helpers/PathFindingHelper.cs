@@ -52,7 +52,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
             {
                 var p1 = (int)nearestMinion.X / gridStep;
                 var p2 = (int)nearestMinion.Y / gridStep;
-                FillMovableCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius * 1.1) / gridStep, gridSize, MovableMatrix, false);
+                FillMovableCircle(p1, p2, (int)(nearestMinion.Radius + Tick.Self.Radius * 1.2) / gridStep, gridSize, MovableMatrix, false);
             }
 
             var startGridPos = GetGridPosByPoint2d(start, gridStep);

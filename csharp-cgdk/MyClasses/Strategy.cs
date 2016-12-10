@@ -96,7 +96,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 {
                     AtackTarget(target);
                     if (target.Faction != Faction.Neutral && target.Faction != Faction.Other &&
-                        Tick.Self.GetDistanceTo(target) > Tick.Self.CastRange*0.8)
+                        Tick.Self.GetDistanceTo(target) > Tick.Self.CastRange*0.9)
                     {
                         MoveHelper.MoveTo(new MoveToParams()
                         {

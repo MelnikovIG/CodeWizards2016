@@ -43,17 +43,17 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses.Helpers
 
         public static SkillType? GetSkillToLearn()
         {
-            var level = Tick.Self.Level;
-            if (level == 0)
+            var mySkills = Tick.Self.Skills;
+
+            foreach (var skillType in skills)
             {
-                return null;
+                if (!mySkills.Contains(skillType))
+                {
+                    return skillType;
+                }
             }
 
-            if (level > skills.Length)
-            {
-                return null;
-            }
-            return skills[level - 1];
+            return null;
         }
     }
 }

@@ -58,10 +58,7 @@ namespace Com.CodeGame.CodeWizards2016.DevKit.CSharpCgdk.MyClasses
                 }
             }
 
-            //DebugTrace.ExecuteVisualizer(() =>
-            //{
-            //    DebugTrace.ConsoleWriteLite($"XP {Tick.Self.Xp} Level {Tick.Self.Level} Skills {string.Join(", ", Tick.Self.Skills)}");
-            //});
+            //DebugHelper.ConsoleWriteLite($"XP {Tick.Self.Xp} Level {Tick.Self.Level} Skills {string.Join(", ", Tick.Self.Skills)}");
 
             var pushPower = PushPowerHelper.GetPushPower();
 
